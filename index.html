@@ -1,107 +1,133 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prácticas del lenguaje</title>
-    <style>
-        body {
-            font-family: 'Comic Sans MS', cursive, sans-serif;
-            text-align: center;
-            background-color: #fef6e4;
-            padding: 20px;
-        }
-        img {
-            width: 150px;
-            height: auto;
-            margin: 10px;
-        }
-        button {
-            font-size: 18px;
-            padding: 10px 20px;
-            margin: 10px;
-            border: none;
-            border-radius: 10px;
-            background-color: #ffd6e0;
-            cursor: pointer;
-        }
-        .btn-grid {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .btn-grid button {
-            width: 250px;
-            margin: 10px;
-        }
-    </style>
-    <script>
-        let nombre = "";
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Prácticas del lenguaje</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      text-align: center;
+      background-color: #fef6e4;
+      padding: 20px;
+    }
+    img {
+      width: 150px;
+      height: auto;
+      margin: 10px;
+    }
+    button {
+      font-size: 18px;
+      padding: 10px 20px;
+      margin: 10px;
+      border: none;
+      border-radius: 10px;
+      background-color: #ffd6e0;
+      cursor: pointer;
+    }
+    .btn-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .btn-grid button {
+      width: 250px;
+      margin: 10px;
+    }
+  </style>
+  <script>
+    let nombre = "";
 
-        function iniciarJuego() {
-            document.getElementById("inicio").style.display = "none";
-            document.getElementById("elegirNombre").style.display = "block";
-        }
+    window.onload = function () {
+      const nombreGuardado = localStorage.getItem("nombreLenguaje");
+      if (nombreGuardado) {
+        nombre = nombreGuardado;
+        document.getElementById("inicio").style.display = "none";
+        document.getElementById("menuPrincipal").style.display = "block";
+        document.getElementById("saludo").innerText = "Hola, " + nombre + ". ¿Qué te gustaría elegir?";
+      }
+    }
 
-        function elegirNombre(nom) {
-            nombre = nom;
-            document.getElementById("elegirNombre").style.display = "none";
-            document.getElementById("menuPrincipal").style.display = "block";
-            document.getElementById("saludo").innerText = "Hola, " + nombre + ". ¿Qué te gustaría elegir?";
-        }
+    function iniciarJuego() {
+      document.getElementById("inicio").style.display = "none";
+      document.getElementById("elegirNombre").style.display = "block";
+    }
 
-        function reiniciar() {
-            location.reload();
-        }
+    function elegirNombre(nom) {
+      nombre = nom;
+      localStorage.setItem("nombreLenguaje", nombre);
+      document.getElementById("elegirNombre").style.display = "none";
+      document.getElementById("menuPrincipal").style.display = "block";
+      document.getElementById("saludo").innerText = "Hola, " + nombre + ". ¿Qué te gustaría elegir?";
+    }
 
-        function verTema(temaId) {
-            document.getElementById("menuPrincipal").style.display = "none";
-            document.getElementById("temaTitulo").innerText = "Hoy veremos " + temaId + "...";
-            document.getElementById("contenidoTema").style.display = "block";
-        }
-    </script>
+    function reiniciar() {
+      localStorage.removeItem("nombreLenguaje");
+      location.reload();
+    }
+
+    function verTema(temaId) {
+      document.getElementById("menuPrincipal").style.display = "none";
+      document.getElementById("temaTitulo").innerText = "Hoy veremos " + temaId + "...";
+      document.getElementById("contenidoTema").style.display = "block";
+
+      const textos = {
+        "Mayúsculas y minúsculas": `Usamos mayúscula al comienzo de una oración, en nombres propios (como Lucía o Sofía) y en los días de la semana.\nEjemplo: "Mi perro se llama Coco." → 'Mi' empieza con mayúscula porque es el inicio.`,
+        "¿B o V?": `La 'b' se usa en palabras como burro, biblioteca, beso.\nLa 'v' se usa en palabras como vaca, ventana, volar.\nConsejo: ¡Escuchá el sonido y pensá si ya conocés la palabra!`,
+        "¿S, Z o C?": `Se usa 's' en casa, rosa, beso.\nSe usa 'z' en zapato, arroz, pez.\nSe usa 'c' en cielo, cena, coche.\nFijate cómo termina la palabra o cómo suena para adivinar cuál usar.`,
+        "¿Cuándo usar la letra H?": `La H no suena, ¡pero está ahí! Algunas palabras siempre la llevan, como:\n- huevo\n- hacer\n- hola\nHay que memorizarlas porque no se escuchan.`,
+        "Separar palabras": `Las oraciones están formadas por varias palabras.\nEs importante dejar un espacio entre cada palabra.\nEjemplo:\n"Losunicorniosjuegan" está mal. → "Los unicornios juegan" está bien.`,
+        "Agudas, graves, esdrújulas": `- Agudas: llevan tilde si terminan en n, s o vocal. (camión)\n- Graves: llevan tilde si NO terminan en n, s o vocal. (lápiz)\n- Esdrújulas: siempre llevan tilde. (pájaro, teléfono)`,
+        "Porque, por qué, porqué y por que": `- porque: para responder. "Lo hice porque quise."\n- por qué: para preguntar. "¿Por qué llorás?"\n- porqué: es un sustantivo. "El porqué de su tristeza."\n- por que: poco usado. "Luchó por que lo escuchen."`,
+        "Sustantivos": `Son palabras que nombran personas, animales, cosas o lugares.\nEjemplos:\n- Persona: mamá, Juan\n- Animal: perro, unicornio\n- Cosa: libro, flor\n- Lugar: escuela, bosque`,
+        "Plural y singular": `- Singular: habla de una sola cosa. (flor)\n- Plural: habla de muchas. (flores)\nSi termina en vocal, agregamos 's'. (casa → casas)\nSi termina en consonante, agregamos 'es'. (reloj → relojes)`,
+        "Pronombres": `Los pronombres reemplazan nombres.\n- Yo, tú, él, ella, nosotros, ustedes, ellos\nEjemplo:\n"Lucía juega" → "Ella juega"\n"Juan y yo corremos" → "Nosotros corremos"`
+      };
+
+      document.getElementById("textoTema").innerText = textos[temaId];
+    }
+  </script>
 </head>
 <body>
 
-    <div id="inicio">
-        <h1>Peques, bienvenidas a Prácticas del lenguaje</h1>
-        <div>
-            <img src="carpincho.png" alt="Carpincho">
-            <img src="unicornio.png" alt="Unicornio">
-        </div>
-        <button onclick="iniciarJuego()">Empezar a jugar</button>
+  <div id="inicio">
+    <h1>Peques, bienvenidas a Prácticas del lenguaje</h1>
+    <div>
+      <img src="carpincho.png" alt="Carpincho" />
+      <img src="unicornio.png" alt="Unicornio" />
     </div>
+    <button onclick="iniciarJuego()">Empezar a jugar</button>
+  </div>
 
-    <div id="elegirNombre" style="display:none;">
-        <h1>¿Quién va a jugar?</h1>
-        <button onclick="elegirNombre('Lucía')">Lucía</button>
-        <button onclick="elegirNombre('Sofía')">Sofía</button>
-        <br><br>
-        <button onclick="reiniciar()">Reiniciar progreso</button>
-    </div>
+  <div id="elegirNombre" style="display:none;">
+    <h1>¿Quién va a jugar?</h1>
+    <button onclick="elegirNombre('Lucía')">Lucía</button>
+    <button onclick="elegirNombre('Sofía')">Sofía</button>
+    <br /><br />
+    <button onclick="reiniciar()">Reiniciar progreso</button>
+  </div>
 
-    <div id="menuPrincipal" style="display:none;">
-        <h1 id="saludo"></h1>
-        <div class="btn-grid">
-            <button onclick="verTema('Mayúsculas y minúsculas')">Mayúsculas y minúsculas</button>
-            <button onclick="verTema('¿B o V?')">¿B o V?</button>
-            <button onclick="verTema('¿S, Z o C?')">¿S, Z o C?</button>
-            <button onclick="verTema('¿Cuándo usar la letra H?')">¿Cuándo usar la letra H?</button>
-            <button onclick="verTema('Separar palabras')">Separar palabras</button>
-            <button onclick="verTema('Agudas, graves, esdrújulas')">Agudas, graves, esdrújulas</button>
-            <button onclick="verTema('Porque, por qué, porqué y por que')">Porque, por qué, porqué y por que</button>
-            <button onclick="verTema('Sustantivos')">Sustantivos</button>
-            <button onclick="verTema('Plural y singular')">Plural y singular</button>
-            <button onclick="verTema('Pronombres')">Pronombres</button>
-        </div>
+  <div id="menuPrincipal" style="display:none;">
+    <h1 id="saludo"></h1>
+    <div class="btn-grid">
+      <button onclick="verTema('Mayúsculas y minúsculas')">Mayúsculas y minúsculas</button>
+      <button onclick="verTema('¿B o V?')">¿B o V?</button>
+      <button onclick="verTema('¿S, Z o C?')">¿S, Z o C?</button>
+      <button onclick="verTema('¿Cuándo usar la letra H?')">¿Cuándo usar la letra H?</button>
+      <button onclick="verTema('Separar palabras')">Separar palabras</button>
+      <button onclick="verTema('Agudas, graves, esdrújulas')">Agudas, graves, esdrújulas</button>
+      <button onclick="verTema('Porque, por qué, porqué y por que')">Porque, por qué, porqué y por que</button>
+      <button onclick="verTema('Sustantivos')">Sustantivos</button>
+      <button onclick="verTema('Plural y singular')">Plural y singular</button>
+      <button onclick="verTema('Pronombres')">Pronombres</button>
     </div>
+  </div>
 
-    <div id="contenidoTema" style="display:none;">
-        <h1 id="temaTitulo"></h1>
-        <p>[Aquí irán las ideas desarrolladas según el tema elegido]</p>
-        <button onclick="location.reload()">Volver al inicio</button>
-    </div>
+  <div id="contenidoTema" style="display:none;">
+    <h1 id="temaTitulo"></h1>
+    <p id="textoTema"></p>
+    <button onclick="history.back()">Volver</button>
+  </div>
 
 </body>
 </html>
