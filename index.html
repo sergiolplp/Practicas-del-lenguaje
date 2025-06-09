@@ -203,20 +203,25 @@
   }
 
   function verificarRespuesta(indice) {
-    const msg = document.getElementById("mensajeRespuesta");
-    if (indice === actualPregunta.correcta) {
-      puntaje++;
-      msg.innerText = "¡Muy bien!";
-      msg.className = "mensaje";
-      if (puntaje % 10 === 0) {
-        nivel++;
-      }
-      siguientePregunta();
-    } else {
-      msg.innerText = "Ups... Intentá de nuevo.";
-      msg.className = "mensaje error";
+  const msg = document.getElementById("mensajeRespuesta");
+  if (indice === actualPregunta.correcta) {
+    puntaje++;
+    msg.innerText = "¡Muy bien!";
+    msg.className = "mensaje";
+    if (puntaje % 10 === 0) {
+      nivel++;
     }
+    actualizarBarra();
+    document.getElementById("puntaje").innerText = `Puntaje: ${puntaje} · Nivel: ${nivel}`;
+    setTimeout(() => {
+      msg.innerText = "";
+      siguientePregunta();
+    }, 1000); // Espera 1 segundo antes de pasar a otra pregunta
+  } else {
+    msg.innerText = "Ups... Intentá de nuevo.";
+    msg.className = "mensaje error";
   }
+}
 
   function actualizarBarra() {
     const barra = document.getElementById("barraNivel");
