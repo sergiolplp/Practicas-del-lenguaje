@@ -1,172 +1,244 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Prácticas del lenguaje</title>
-<style>
-  body { font-family: 'Comic Sans MS', cursive, sans-serif; background: #fef6e4; text-align: center; padding: 20px; }
-  img { width: 150px; height: auto; margin: 10px; }
-  button { font-size: 18px; padding: 10px 20px; margin: 10px; border: none; border-radius: 10px; background: #ffd6e0; cursor: pointer; }
-  .btn-grid { display: flex; flex-wrap: wrap; justify-content: center; }
-  .btn-grid button { width: 250px; margin: 10px; }
-</style>
-<script>
-let nombre="", puntaje=0, nivel=1;
-const bancos = {
-  // Rellenar con 50 preguntas realmente distintas por cada categoría
-  "Mayúsculas y minúsculas": Array(50).fill().map((_,i)=>({
-    texto: `¿Cuál está bien? Ej. #${i+1}`,
-    opciones: ["juan", "Juan", "JUAN"],
-    correcta: 1
-  })),
-  "¿B o V?": Array(50).fill().map((_,i)=>({
-    texto: `¿Cómo se escribe la palabra #${i+1}?`,
-    opciones: ["baca","vaca","vaka"],
-    correcta: 1
-  })),
-  "¿S, Z o C?": Array(50).fill().map((_,i)=>({
-    texto: `¿Qué letra es correcta en palabra #${i+1}?`,
-    opciones: ["s","z","c"],
-    correcta: Math.floor(Math.random()*3)
-  })),
-  "¿Cuándo usar la letra H?": Array(50).fill().map((_,i)=>({
-    texto: `¿Lleva H la palabra #${i+1}?`,
-    opciones: ["ola","hola","ola"],
-    correcta: 1
-  })),
-  "Separar palabras": Array(50).fill().map((_,i)=>({
-    texto: `¿Está bien separado? #${i+1}`,
-    opciones: ["Globo rojo","Globorojo","Glo bo rojo"],
-    correcta: 0
-  })),
-  "Agudas, graves, esdrújulas": Array(50).fill().map((_,i)=>({
-    texto: `¿Qué clase es la palabra #${i+1}?`,
-    opciones: ["Aguda","Grave","Esdrújula"],
-    correcta: Math.floor(Math.random()*3)
-  })),
-  "Porque, por qué, porqué y por que": Array(50).fill().map((_,i)=>({
-    texto: `¿Qué forma usarías al contestar #${i+1}?`,
-    opciones: ["porque","por qué","porqué"],
-    correcta: 0
-  })),
-  "Sustantivos": Array(50).fill().map((_,i)=>({
-    texto: `¿Cuál es un sustantivo #${i+1}?`,
-    opciones: ["correr","flor","grande"],
-    correcta: 1
-  })),
-  "Plural y singular": Array(50).fill().map((_,i)=>({
-    texto: `¿Cuál es plural #${i+1}?`,
-    opciones: ["casa","casas","casita"],
-    correcta: 1
-  })),
-  "Pronombres": Array(50).fill().map((_,i)=>({
-    texto: `¿Qué pronombre corresponde #${i+1}?`,
-    opciones: ["Ella","Nosotros","Tú"],
-    correcta: Math.floor(Math.random()*3)
-  }))
-};
-
-let actualTema="", actualPregunta;
-
-function iniciarJuego(){
-  document.getElementById("inicio").style.display="none";
-  document.getElementById("elegirNombre").style.display="block";
-}
-function elegirNombre(nom){
-  nombre=nom;
-  localStorage.setItem("peques_nombre", nombre);
-  document.getElementById("elegirNombre").style.display="none";
-  document.getElementById("menuPrincipal").style.display="block";
-  mostrarSaludo();
-}
-function mostrarSaludo(){
-  document.getElementById("saludo").innerText=`Hola, ${nombre}. ¿Qué te gustaría elegir?`;
-}
-function reiniciar(){
-  localStorage.removeItem("peques_nombre");
-  location.reload();
-}
-function verTema(tema){
-  actualTema=tema;
-  document.getElementById("menuPrincipal").style.display="none";
-  document.getElementById("contenidoTema").style.display="block";
-  cargarPregunta();
-}
-function cargarPregunta(){
-  const arr=bancos[actualTema];
-  actualPregunta=arr[Math.floor(Math.random()*arr.length)];
-  document.getElementById("preguntaTexto").innerText=actualPregunta.texto;
-  const divOps=document.getElementById("opciones");
-  divOps.innerHTML="";
-  actualPregunta.opciones.forEach((opt,i)=>{
-    const btn = document.createElement("button");
-    btn.innerText=opt;
-    btn.onclick=()=>responder(i);
-    divOps.appendChild(btn);
-  });
-  document.getElementById("puntaje").innerText=`Puntaje: ${puntaje} · Nivel: ${nivel}`;
-}
-function responder(i){
-  if(i===actualPregunta.correcta){
-    puntaje++;
-    if(puntaje%10===0){
-      nivel++;
-      alert(`🎉 ¡Subiste al nivel ${nivel}!`);
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Prácticas del lenguaje</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: #fef6e4;
+      text-align: center;
+      padding: 20px;
     }
-    cargarPregunta();
-  } else {
-    alert("Ups! Intentá de nuevo 😊");
-  }
-}
-
-window.onload=function(){
-  const guardado=localStorage.getItem("peques_nombre");
-  if(guardado){ nombre=guardado;
-    document.getElementById("inicio").style.display="none";
-    document.getElementById("elegirNombre").style.display="none";
-    document.getElementById("menuPrincipal").style.display="block";
-    mostrarSaludo();
-  }
-}
-</script>
+    img { width: 150px; margin: 10px; }
+    button {
+      font-size: 18px;
+      padding: 10px 20px;
+      margin: 10px;
+      border: none;
+      border-radius: 10px;
+      background: #ffd6e0;
+      cursor: pointer;
+    }
+    .btn-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .btn-grid button {
+      width: 250px;
+      margin: 10px;
+    }
+    .barra {
+      width: 100%;
+      background-color: #ddd;
+      border-radius: 10px;
+      margin: 10px 0;
+    }
+    .barra-interna {
+      height: 20px;
+      width: 0%;
+      background-color: #ff8fab;
+      border-radius: 10px;
+      transition: width 0.5s ease;
+    }
+    .mensaje {
+      font-weight: bold;
+      font-size: 20px;
+      margin: 10px;
+      color: green;
+    }
+    .error {
+      color: red;
+    }
+  </style>
 </head>
 <body>
+
+<!-- INICIO -->
 <div id="inicio">
   <h1>Peques, bienvenidas a Prácticas del lenguaje</h1>
-  <div><img src="carpincho.png" alt="Carpincho"/><img src="unicornio.png" alt="Unicornio"/></div>
-  <button onclick="iniciarJuego()">Empezar a jugar</button>
+  <div><img src="carpincho.png" alt="Carpincho"><img src="unicornio.png" alt="Unicornio"></div>
+  <button onclick="mostrar('elegirNombre')">Empezar a jugar</button>
 </div>
 
-<div id="elegirNombre" style="display:none">
+<!-- ELEGIR NOMBRE -->
+<div id="elegirNombre" style="display:none;">
   <h1>¿Quién va a jugar?</h1>
   <button onclick="elegirNombre('Lucía')">Lucía</button>
   <button onclick="elegirNombre('Sofía')">Sofía</button>
-  <br/><br/><button onclick="reiniciar()">Reiniciar progreso</button>
+  <br><br>
+  <button onclick="reiniciar()">Reiniciar progreso</button><br><br>
+  <button onclick="mostrar('inicio')">Volver</button>
 </div>
 
-<div id="menuPrincipal" style="display:none">
+<!-- MENÚ PRINCIPAL -->
+<div id="menuPrincipal" style="display:none;">
   <h1 id="saludo"></h1>
-  <div class="btn-grid">
-    <button onclick="verTema('Mayúsculas y minúsculas')">Mayúsculas y minúsculas</button>
-    <button onclick="verTema('¿B o V?')">¿B o V?</button>
-    <button onclick="verTema('¿S, Z o C?')">¿S, Z o C?</button>
-    <button onclick="verTema('¿Cuándo usar la letra H?')">¿Cuándo usar la letra H?</button>
-    <button onclick="verTema('Separar palabras')">Separar palabras</button>
-    <button onclick="verTema('Agudas, graves, esdrújulas')">Agudas, graves, esdrújulas</button>
-    <button onclick="verTema('Porque, por qué, porqué y por que')">Porque, por qué, porqué y por que</button>
-    <button onclick="verTema('Sustantivos')">Sustantivos</button>
-    <button onclick="verTema('Plural y singular')">Plural y singular</button>
-    <button onclick="verTema('Pronombres')">Pronombres</button>
-  </div>
+  <div class="btn-grid" id="botonesCategorias"></div>
+  <button onclick="mostrar('elegirNombre')">Volver</button>
 </div>
 
-<div id="contenidoTema" style="display:none">
-  <h1 id="temaTitulo">...</h1>
-  <p id="puntaje">Puntaje: 0 · Nivel: 1</p>
+<!-- CONTENIDO DE CATEGORÍA -->
+<div id="contenidoTema" style="display:none;">
+  <h1 id="tituloCategoria"></h1>
+  <p id="explicacionCategoria"></p>
+  <div class="barra"><div id="barraNivel" class="barra-interna"></div></div>
+  <p id="puntaje"></p>
   <p id="preguntaTexto"></p>
   <div id="opciones"></div>
-  <button onclick="history.back()">Volver</button>
+  <p id="mensajeRespuesta" class="mensaje"></p>
+  <button onclick="mostrar('menuPrincipal')">Volver</button>
 </div>
+
+<script>
+  let nombre = "", puntaje = 0, nivel = 1;
+  let actualCategoria = "", actualPregunta = {};
+  const bancos = {
+    "Mayúsculas y minúsculas": Array(50).fill().map((_, i) => ({
+      texto: `¿Cuál está bien? Ej. #${i+1}`,
+      opciones: ["juan", "Juan", "JUAN"],
+      correcta: 1
+    })),
+    "¿B o V?": Array(50).fill().map((_, i) => ({
+      texto: `¿Cómo se escribe la palabra #${i+1}?`,
+      opciones: ["baca", "vaca", "vaka"],
+      correcta: 1
+    })),
+    "¿S, Z o C?": Array(50).fill().map((_, i) => ({
+      texto: `¿Qué letra es correcta en palabra #${i+1}?`,
+      opciones: ["s", "z", "c"],
+      correcta: Math.floor(Math.random() * 3)
+    })),
+    "¿Cuándo usar la letra H?": Array(50).fill().map((_, i) => ({
+      texto: `¿Lleva H la palabra #${i+1}?`,
+      opciones: ["ola", "hola", "ola"],
+      correcta: 1
+    })),
+    "Separar palabras": Array(50).fill().map((_, i) => ({
+      texto: `¿Está bien separado? #${i+1}`,
+      opciones: ["Globo rojo", "Globorojo", "Glo bo rojo"],
+      correcta: 0
+    })),
+    "Agudas, graves, esdrújulas": Array(50).fill().map((_, i) => ({
+      texto: `¿Qué clase es la palabra #${i+1}?`,
+      opciones: ["Aguda", "Grave", "Esdrújula"],
+      correcta: Math.floor(Math.random() * 3)
+    })),
+    "Porque, por qué, porqué y por que": Array(50).fill().map((_, i) => ({
+      texto: `¿Qué forma usarías al contestar #${i+1}?`,
+      opciones: ["porque", "por qué", "porqué", "por que"],
+      correcta: 0
+    })),
+    "Sustantivos": Array(50).fill().map((_, i) => ({
+      texto: `¿Cuál es un sustantivo #${i+1}?`,
+      opciones: ["correr", "flor", "grande"],
+      correcta: 1
+    })),
+    "Plural y singular": Array(50).fill().map((_, i) => ({
+      texto: `¿Cuál es plural #${i+1}?`,
+      opciones: ["casa", "casas", "casita"],
+      correcta: 1
+    })),
+    "Pronombres": Array(50).fill().map((_, i) => ({
+      texto: `¿Qué pronombre corresponde #${i+1}?`,
+      opciones: ["Ella", "Nosotros", "Tú"],
+      correcta: Math.floor(Math.random() * 3)
+    }))
+  };
+
+  const explicaciones = {
+    "Mayúsculas y minúsculas": "Las mayúsculas se usan para comenzar nombres propios y al inicio de una oración.",
+    "¿B o V?": "Algunas palabras llevan B, otras V. ¡Aprendamos cuál va!",
+    "¿S, Z o C?": "Estas letras suenan parecido pero se escriben distinto.",
+    "¿Cuándo usar la letra H?": "La H es muda, pero se escribe en muchas palabras.",
+    "Separar palabras": "Aprendamos cuándo una palabra es una o varias.",
+    "Agudas, graves, esdrújulas": "Según cómo se acentúan, cambian de nombre.",
+    "Porque, por qué, porqué y por que": "Parecen iguales, pero tienen usos distintos.",
+    "Sustantivos": "Los sustantivos nombran cosas, personas o lugares.",
+    "Plural y singular": "Singular es uno. Plural es más de uno.",
+    "Pronombres": "Los usamos para hablar de personas sin decir sus nombres."
+  };
+
+  function mostrar(id) {
+    document.querySelectorAll("body > div").forEach(d => d.style.display = "none");
+    document.getElementById(id).style.display = "block";
+  }
+
+  function elegirNombre(nom) {
+    nombre = nom;
+    localStorage.setItem("peques_nombre", nombre);
+    mostrar("menuPrincipal");
+    document.getElementById("saludo").innerText = `Hola, ${nombre}. ¿Qué te gustaría elegir?`;
+  }
+
+  function reiniciar() {
+    localStorage.removeItem("peques_nombre");
+    location.reload();
+  }
+
+  function iniciarCategoria(categoria) {
+    actualCategoria = categoria;
+    document.getElementById("tituloCategoria").innerText = "Hoy veremos: " + categoria;
+    document.getElementById("explicacionCategoria").innerText = explicaciones[categoria] || "";
+    document.getElementById("mensajeRespuesta").innerText = "";
+    mostrar("contenidoTema");
+    siguientePregunta();
+  }
+
+  function siguientePregunta() {
+    const arr = bancos[actualCategoria];
+    actualPregunta = arr[Math.floor(Math.random() * arr.length)];
+    document.getElementById("preguntaTexto").innerText = actualPregunta.texto;
+    document.getElementById("opciones").innerHTML = "";
+    actualPregunta.opciones.forEach((op, i) => {
+      const btn = document.createElement("button");
+      btn.innerText = op;
+      btn.onclick = () => verificarRespuesta(i);
+      document.getElementById("opciones").appendChild(btn);
+    });
+    actualizarBarra();
+    document.getElementById("puntaje").innerText = `Puntaje: ${puntaje} · Nivel: ${nivel}`;
+  }
+
+  function verificarRespuesta(indice) {
+    const msg = document.getElementById("mensajeRespuesta");
+    if (indice === actualPregunta.correcta) {
+      puntaje++;
+      msg.innerText = "¡Muy bien!";
+      msg.className = "mensaje";
+      if (puntaje % 10 === 0) {
+        nivel++;
+      }
+      siguientePregunta();
+    } else {
+      msg.innerText = "Ups... Intentá de nuevo.";
+      msg.className = "mensaje error";
+    }
+  }
+
+  function actualizarBarra() {
+    const barra = document.getElementById("barraNivel");
+    const progreso = (puntaje % 10) * 10;
+    barra.style.width = progreso + "%";
+  }
+
+  window.onload = function() {
+    const guardado = localStorage.getItem("peques_nombre");
+    if (guardado) {
+      nombre = guardado;
+      mostrar("menuPrincipal");
+      document.getElementById("saludo").innerText = `Hola, ${nombre}. ¿Qué te gustaría elegir?`;
+    }
+    const botones = Object.keys(bancos).map(cat => {
+      const btn = document.createElement("button");
+      btn.innerText = cat;
+      btn.onclick = () => iniciarCategoria(cat);
+      return btn;
+    });
+    botones.forEach(b => document.getElementById("botonesCategorias").appendChild(b));
+  };
+</script>
 </body>
 </html>
