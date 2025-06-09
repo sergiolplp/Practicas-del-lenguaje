@@ -1,133 +1,172 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Prácticas del lenguaje</title>
-  <style>
-    body {
-      font-family: 'Comic Sans MS', cursive, sans-serif;
-      text-align: center;
-      background-color: #fef6e4;
-      padding: 20px;
-    }
-    img {
-      width: 150px;
-      height: auto;
-      margin: 10px;
-    }
-    button {
-      font-size: 18px;
-      padding: 10px 20px;
-      margin: 10px;
-      border: none;
-      border-radius: 10px;
-      background-color: #ffd6e0;
-      cursor: pointer;
-    }
-    .btn-grid {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    .btn-grid button {
-      width: 250px;
-      margin: 10px;
-    }
-  </style>
-  <script>
-    let nombre = "";
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Prácticas del lenguaje</title>
+<style>
+  body { font-family: 'Comic Sans MS', cursive, sans-serif; background: #fef6e4; text-align: center; padding: 20px; }
+  img { width: 150px; height: auto; margin: 10px; }
+  button { font-size: 18px; padding: 10px 20px; margin: 10px; border: none; border-radius: 10px; background: #ffd6e0; cursor: pointer; }
+  .btn-grid { display: flex; flex-wrap: wrap; justify-content: center; }
+  .btn-grid button { width: 250px; margin: 10px; }
+</style>
+<script>
+let nombre="", puntaje=0, nivel=1;
+const bancos = {
+  // Rellenar con 50 preguntas realmente distintas por cada categoría
+  "Mayúsculas y minúsculas": Array(50).fill().map((_,i)=>({
+    texto: `¿Cuál está bien? Ej. #${i+1}`,
+    opciones: ["juan", "Juan", "JUAN"],
+    correcta: 1
+  })),
+  "¿B o V?": Array(50).fill().map((_,i)=>({
+    texto: `¿Cómo se escribe la palabra #${i+1}?`,
+    opciones: ["baca","vaca","vaka"],
+    correcta: 1
+  })),
+  "¿S, Z o C?": Array(50).fill().map((_,i)=>({
+    texto: `¿Qué letra es correcta en palabra #${i+1}?`,
+    opciones: ["s","z","c"],
+    correcta: Math.floor(Math.random()*3)
+  })),
+  "¿Cuándo usar la letra H?": Array(50).fill().map((_,i)=>({
+    texto: `¿Lleva H la palabra #${i+1}?`,
+    opciones: ["ola","hola","ola"],
+    correcta: 1
+  })),
+  "Separar palabras": Array(50).fill().map((_,i)=>({
+    texto: `¿Está bien separado? #${i+1}`,
+    opciones: ["Globo rojo","Globorojo","Glo bo rojo"],
+    correcta: 0
+  })),
+  "Agudas, graves, esdrújulas": Array(50).fill().map((_,i)=>({
+    texto: `¿Qué clase es la palabra #${i+1}?`,
+    opciones: ["Aguda","Grave","Esdrújula"],
+    correcta: Math.floor(Math.random()*3)
+  })),
+  "Porque, por qué, porqué y por que": Array(50).fill().map((_,i)=>({
+    texto: `¿Qué forma usarías al contestar #${i+1}?`,
+    opciones: ["porque","por qué","porqué"],
+    correcta: 0
+  })),
+  "Sustantivos": Array(50).fill().map((_,i)=>({
+    texto: `¿Cuál es un sustantivo #${i+1}?`,
+    opciones: ["correr","flor","grande"],
+    correcta: 1
+  })),
+  "Plural y singular": Array(50).fill().map((_,i)=>({
+    texto: `¿Cuál es plural #${i+1}?`,
+    opciones: ["casa","casas","casita"],
+    correcta: 1
+  })),
+  "Pronombres": Array(50).fill().map((_,i)=>({
+    texto: `¿Qué pronombre corresponde #${i+1}?`,
+    opciones: ["Ella","Nosotros","Tú"],
+    correcta: Math.floor(Math.random()*3)
+  }))
+};
 
-    window.onload = function () {
-      const nombreGuardado = localStorage.getItem("nombreLenguaje");
-      if (nombreGuardado) {
-        nombre = nombreGuardado;
-        document.getElementById("inicio").style.display = "none";
-        document.getElementById("menuPrincipal").style.display = "block";
-        document.getElementById("saludo").innerText = "Hola, " + nombre + ". ¿Qué te gustaría elegir?";
-      }
+let actualTema="", actualPregunta;
+
+function iniciarJuego(){
+  document.getElementById("inicio").style.display="none";
+  document.getElementById("elegirNombre").style.display="block";
+}
+function elegirNombre(nom){
+  nombre=nom;
+  localStorage.setItem("peques_nombre", nombre);
+  document.getElementById("elegirNombre").style.display="none";
+  document.getElementById("menuPrincipal").style.display="block";
+  mostrarSaludo();
+}
+function mostrarSaludo(){
+  document.getElementById("saludo").innerText=`Hola, ${nombre}. ¿Qué te gustaría elegir?`;
+}
+function reiniciar(){
+  localStorage.removeItem("peques_nombre");
+  location.reload();
+}
+function verTema(tema){
+  actualTema=tema;
+  document.getElementById("menuPrincipal").style.display="none";
+  document.getElementById("contenidoTema").style.display="block";
+  cargarPregunta();
+}
+function cargarPregunta(){
+  const arr=bancos[actualTema];
+  actualPregunta=arr[Math.floor(Math.random()*arr.length)];
+  document.getElementById("preguntaTexto").innerText=actualPregunta.texto;
+  const divOps=document.getElementById("opciones");
+  divOps.innerHTML="";
+  actualPregunta.opciones.forEach((opt,i)=>{
+    const btn = document.createElement("button");
+    btn.innerText=opt;
+    btn.onclick=()=>responder(i);
+    divOps.appendChild(btn);
+  });
+  document.getElementById("puntaje").innerText=`Puntaje: ${puntaje} · Nivel: ${nivel}`;
+}
+function responder(i){
+  if(i===actualPregunta.correcta){
+    puntaje++;
+    if(puntaje%10===0){
+      nivel++;
+      alert(`🎉 ¡Subiste al nivel ${nivel}!`);
     }
+    cargarPregunta();
+  } else {
+    alert("Ups! Intentá de nuevo 😊");
+  }
+}
 
-    function iniciarJuego() {
-      document.getElementById("inicio").style.display = "none";
-      document.getElementById("elegirNombre").style.display = "block";
-    }
-
-    function elegirNombre(nom) {
-      nombre = nom;
-      localStorage.setItem("nombreLenguaje", nombre);
-      document.getElementById("elegirNombre").style.display = "none";
-      document.getElementById("menuPrincipal").style.display = "block";
-      document.getElementById("saludo").innerText = "Hola, " + nombre + ". ¿Qué te gustaría elegir?";
-    }
-
-    function reiniciar() {
-      localStorage.removeItem("nombreLenguaje");
-      location.reload();
-    }
-
-    function verTema(temaId) {
-      document.getElementById("menuPrincipal").style.display = "none";
-      document.getElementById("temaTitulo").innerText = "Hoy veremos " + temaId + "...";
-      document.getElementById("contenidoTema").style.display = "block";
-
-      const textos = {
-        "Mayúsculas y minúsculas": `Usamos mayúscula al comienzo de una oración, en nombres propios (como Lucía o Sofía) y en los días de la semana.\nEjemplo: "Mi perro se llama Coco." → 'Mi' empieza con mayúscula porque es el inicio.`,
-        "¿B o V?": `La 'b' se usa en palabras como burro, biblioteca, beso.\nLa 'v' se usa en palabras como vaca, ventana, volar.\nConsejo: ¡Escuchá el sonido y pensá si ya conocés la palabra!`,
-        "¿S, Z o C?": `Se usa 's' en casa, rosa, beso.\nSe usa 'z' en zapato, arroz, pez.\nSe usa 'c' en cielo, cena, coche.\nFijate cómo termina la palabra o cómo suena para adivinar cuál usar.`,
-        "¿Cuándo usar la letra H?": `La H no suena, ¡pero está ahí! Algunas palabras siempre la llevan, como:\n- huevo\n- hacer\n- hola\nHay que memorizarlas porque no se escuchan.`,
-        "Separar palabras": `Las oraciones están formadas por varias palabras.\nEs importante dejar un espacio entre cada palabra.\nEjemplo:\n"Losunicorniosjuegan" está mal. → "Los unicornios juegan" está bien.`,
-        "Agudas, graves, esdrújulas": `- Agudas: llevan tilde si terminan en n, s o vocal. (camión)\n- Graves: llevan tilde si NO terminan en n, s o vocal. (lápiz)\n- Esdrújulas: siempre llevan tilde. (pájaro, teléfono)`,
-        "Porque, por qué, porqué y por que": `- porque: para responder. "Lo hice porque quise."\n- por qué: para preguntar. "¿Por qué llorás?"\n- porqué: es un sustantivo. "El porqué de su tristeza."\n- por que: poco usado. "Luchó por que lo escuchen."`,
-        "Sustantivos": `Son palabras que nombran personas, animales, cosas o lugares.\nEjemplos:\n- Persona: mamá, Juan\n- Animal: perro, unicornio\n- Cosa: libro, flor\n- Lugar: escuela, bosque`,
-        "Plural y singular": `- Singular: habla de una sola cosa. (flor)\n- Plural: habla de muchas. (flores)\nSi termina en vocal, agregamos 's'. (casa → casas)\nSi termina en consonante, agregamos 'es'. (reloj → relojes)`,
-        "Pronombres": `Los pronombres reemplazan nombres.\n- Yo, tú, él, ella, nosotros, ustedes, ellos\nEjemplo:\n"Lucía juega" → "Ella juega"\n"Juan y yo corremos" → "Nosotros corremos"`
-      };
-
-      document.getElementById("textoTema").innerText = textos[temaId];
-    }
-  </script>
+window.onload=function(){
+  const guardado=localStorage.getItem("peques_nombre");
+  if(guardado){ nombre=guardado;
+    document.getElementById("inicio").style.display="none";
+    document.getElementById("elegirNombre").style.display="none";
+    document.getElementById("menuPrincipal").style.display="block";
+    mostrarSaludo();
+  }
+}
+</script>
 </head>
 <body>
+<div id="inicio">
+  <h1>Peques, bienvenidas a Prácticas del lenguaje</h1>
+  <div><img src="carpincho.png" alt="Carpincho"/><img src="unicornio.png" alt="Unicornio"/></div>
+  <button onclick="iniciarJuego()">Empezar a jugar</button>
+</div>
 
-  <div id="inicio">
-    <h1>Peques, bienvenidas a Prácticas del lenguaje</h1>
-    <div>
-      <img src="carpincho.png" alt="Carpincho" />
-      <img src="unicornio.png" alt="Unicornio" />
-    </div>
-    <button onclick="iniciarJuego()">Empezar a jugar</button>
+<div id="elegirNombre" style="display:none">
+  <h1>¿Quién va a jugar?</h1>
+  <button onclick="elegirNombre('Lucía')">Lucía</button>
+  <button onclick="elegirNombre('Sofía')">Sofía</button>
+  <br/><br/><button onclick="reiniciar()">Reiniciar progreso</button>
+</div>
+
+<div id="menuPrincipal" style="display:none">
+  <h1 id="saludo"></h1>
+  <div class="btn-grid">
+    <button onclick="verTema('Mayúsculas y minúsculas')">Mayúsculas y minúsculas</button>
+    <button onclick="verTema('¿B o V?')">¿B o V?</button>
+    <button onclick="verTema('¿S, Z o C?')">¿S, Z o C?</button>
+    <button onclick="verTema('¿Cuándo usar la letra H?')">¿Cuándo usar la letra H?</button>
+    <button onclick="verTema('Separar palabras')">Separar palabras</button>
+    <button onclick="verTema('Agudas, graves, esdrújulas')">Agudas, graves, esdrújulas</button>
+    <button onclick="verTema('Porque, por qué, porqué y por que')">Porque, por qué, porqué y por que</button>
+    <button onclick="verTema('Sustantivos')">Sustantivos</button>
+    <button onclick="verTema('Plural y singular')">Plural y singular</button>
+    <button onclick="verTema('Pronombres')">Pronombres</button>
   </div>
+</div>
 
-  <div id="elegirNombre" style="display:none;">
-    <h1>¿Quién va a jugar?</h1>
-    <button onclick="elegirNombre('Lucía')">Lucía</button>
-    <button onclick="elegirNombre('Sofía')">Sofía</button>
-    <br /><br />
-    <button onclick="reiniciar()">Reiniciar progreso</button>
-  </div>
-
-  <div id="menuPrincipal" style="display:none;">
-    <h1 id="saludo"></h1>
-    <div class="btn-grid">
-      <button onclick="verTema('Mayúsculas y minúsculas')">Mayúsculas y minúsculas</button>
-      <button onclick="verTema('¿B o V?')">¿B o V?</button>
-      <button onclick="verTema('¿S, Z o C?')">¿S, Z o C?</button>
-      <button onclick="verTema('¿Cuándo usar la letra H?')">¿Cuándo usar la letra H?</button>
-      <button onclick="verTema('Separar palabras')">Separar palabras</button>
-      <button onclick="verTema('Agudas, graves, esdrújulas')">Agudas, graves, esdrújulas</button>
-      <button onclick="verTema('Porque, por qué, porqué y por que')">Porque, por qué, porqué y por que</button>
-      <button onclick="verTema('Sustantivos')">Sustantivos</button>
-      <button onclick="verTema('Plural y singular')">Plural y singular</button>
-      <button onclick="verTema('Pronombres')">Pronombres</button>
-    </div>
-  </div>
-
-  <div id="contenidoTema" style="display:none;">
-    <h1 id="temaTitulo"></h1>
-    <p id="textoTema"></p>
-    <button onclick="history.back()">Volver</button>
-  </div>
-
+<div id="contenidoTema" style="display:none">
+  <h1 id="temaTitulo">...</h1>
+  <p id="puntaje">Puntaje: 0 · Nivel: 1</p>
+  <p id="preguntaTexto"></p>
+  <div id="opciones"></div>
+  <button onclick="history.back()">Volver</button>
+</div>
 </body>
 </html>
