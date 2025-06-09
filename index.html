@@ -47,11 +47,9 @@
       font-weight: bold;
       font-size: 20px;
       margin: 10px;
-      color: green;
     }
-    .error {
-      color: red;
-    }
+    .mensaje.correcto { color: green; }
+    .mensaje.error { color: red; }
   </style>
 </head>
 <body>
@@ -189,39 +187,42 @@
 
   function siguientePregunta() {
     const arr = bancos[actualCategoria];
-    actualPregunta = arr[Math.floor(Math.random() * arr.length)];
+    let nueva;
+    do {
+      nueva = arr[Math.floor(Math.random() * arr.length)];
+    } while (nueva === actualPregunta);
+    actualPregunta = nueva;
     document.getElementById("preguntaTexto").innerText = actualPregunta.texto;
-    document.getElementById("opciones").innerHTML = "";
+    const opcionesDiv = document.getElementById("opciones");
+    opcionesDiv.innerHTML = "";
     actualPregunta.opciones.forEach((op, i) => {
       const btn = document.createElement("button");
       btn.innerText = op;
       btn.onclick = () => verificarRespuesta(i);
-      document.getElementById("opciones").appendChild(btn);
+      opcionesDiv.appendChild(btn);
     });
     actualizarBarra();
     document.getElementById("puntaje").innerText = `Puntaje: ${puntaje} · Nivel: ${nivel}`;
   }
 
   function verificarRespuesta(indice) {
-  const msg = document.getElementById("mensajeRespuesta");
-  if (indice === actualPregunta.correcta) {
-    puntaje++;
-    msg.innerText = "¡Muy bien!";
-    msg.className = "mensaje";
-    if (puntaje % 10 === 0) {
-      nivel++;
+    const msg = document.getElementById("mensajeRespuesta");
+    if (indice === actualPregunta.correcta) {
+      puntaje++;
+      msg.innerText = "¡Muy bien!";
+      msg.className = "mensaje correcto";
+      if (puntaje % 10 === 0) nivel++;
+      actualizarBarra();
+      document.getElementById("puntaje").innerText = `Puntaje: ${puntaje} · Nivel: ${nivel}`;
+      setTimeout(() => {
+        msg.innerText = "";
+        siguientePregunta();
+      }, 1000);
+    } else {
+      msg.innerText = "Ups... Intentá de nuevo.";
+      msg.className = "mensaje error";
     }
-    actualizarBarra();
-    document.getElementById("puntaje").innerText = `Puntaje: ${puntaje} · Nivel: ${nivel}`;
-    setTimeout(() => {
-      msg.innerText = "";
-      siguientePregunta();
-    }, 1000); // Espera 1 segundo antes de pasar a otra pregunta
-  } else {
-    msg.innerText = "Ups... Intentá de nuevo.";
-    msg.className = "mensaje error";
   }
-}
 
   function actualizarBarra() {
     const barra = document.getElementById("barraNivel");
