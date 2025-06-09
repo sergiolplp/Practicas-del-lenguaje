@@ -1,0 +1,107 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prácticas del lenguaje</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            text-align: center;
+            background-color: #fef6e4;
+            padding: 20px;
+        }
+        img {
+            width: 150px;
+            height: auto;
+            margin: 10px;
+        }
+        button {
+            font-size: 18px;
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 10px;
+            background-color: #ffd6e0;
+            cursor: pointer;
+        }
+        .btn-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .btn-grid button {
+            width: 250px;
+            margin: 10px;
+        }
+    </style>
+    <script>
+        let nombre = "";
+
+        function iniciarJuego() {
+            document.getElementById("inicio").style.display = "none";
+            document.getElementById("elegirNombre").style.display = "block";
+        }
+
+        function elegirNombre(nom) {
+            nombre = nom;
+            document.getElementById("elegirNombre").style.display = "none";
+            document.getElementById("menuPrincipal").style.display = "block";
+            document.getElementById("saludo").innerText = "Hola, " + nombre + ". ¿Qué te gustaría elegir?";
+        }
+
+        function reiniciar() {
+            location.reload();
+        }
+
+        function verTema(temaId) {
+            document.getElementById("menuPrincipal").style.display = "none";
+            document.getElementById("temaTitulo").innerText = "Hoy veremos " + temaId + "...";
+            document.getElementById("contenidoTema").style.display = "block";
+        }
+    </script>
+</head>
+<body>
+
+    <div id="inicio">
+        <h1>Peques, bienvenidas a Prácticas del lenguaje</h1>
+        <div>
+            <img src="carpincho.png" alt="Carpincho">
+            <img src="unicornio.png" alt="Unicornio">
+        </div>
+        <button onclick="iniciarJuego()">Empezar a jugar</button>
+    </div>
+
+    <div id="elegirNombre" style="display:none;">
+        <h1>¿Quién va a jugar?</h1>
+        <button onclick="elegirNombre('Lucía')">Lucía</button>
+        <button onclick="elegirNombre('Sofía')">Sofía</button>
+        <br><br>
+        <button onclick="reiniciar()">Reiniciar progreso</button>
+    </div>
+
+    <div id="menuPrincipal" style="display:none;">
+        <h1 id="saludo"></h1>
+        <div class="btn-grid">
+            <button onclick="verTema('Mayúsculas y minúsculas')">Mayúsculas y minúsculas</button>
+            <button onclick="verTema('¿B o V?')">¿B o V?</button>
+            <button onclick="verTema('¿S, Z o C?')">¿S, Z o C?</button>
+            <button onclick="verTema('¿Cuándo usar la letra H?')">¿Cuándo usar la letra H?</button>
+            <button onclick="verTema('Separar palabras')">Separar palabras</button>
+            <button onclick="verTema('Agudas, graves, esdrújulas')">Agudas, graves, esdrújulas</button>
+            <button onclick="verTema('Porque, por qué, porqué y por que')">Porque, por qué, porqué y por que</button>
+            <button onclick="verTema('Sustantivos')">Sustantivos</button>
+            <button onclick="verTema('Plural y singular')">Plural y singular</button>
+            <button onclick="verTema('Pronombres')">Pronombres</button>
+        </div>
+    </div>
+
+    <div id="contenidoTema" style="display:none;">
+        <h1 id="temaTitulo"></h1>
+        <p>[Aquí irán las ideas desarrolladas según el tema elegido]</p>
+        <button onclick="location.reload()">Volver al inicio</button>
+    </div>
+
+</body>
+</html>
