@@ -192,15 +192,19 @@
       nueva = arr[Math.floor(Math.random() * arr.length)];
     } while (nueva === actualPregunta);
     actualPregunta = nueva;
+
     document.getElementById("preguntaTexto").innerText = actualPregunta.texto;
+
     const opcionesDiv = document.getElementById("opciones");
-    opcionesDiv.innerHTML = "";
+    opcionesDiv.innerHTML = ""; // Limpiar las opciones anteriores
+
     actualPregunta.opciones.forEach((op, i) => {
       const btn = document.createElement("button");
-      btn.innerText = op;
+      btn.textContent = op;
       btn.onclick = () => verificarRespuesta(i);
       opcionesDiv.appendChild(btn);
     });
+
     actualizarBarra();
     document.getElementById("puntaje").innerText = `Puntaje: ${puntaje} · Nivel: ${nivel}`;
   }
