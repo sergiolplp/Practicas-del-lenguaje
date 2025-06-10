@@ -56,26 +56,32 @@
 </head>
 <body>
 
-<!-- PANTALLA INICIO -->
-<section id="pantallaInicio">
+<!-- INICIO -->
+<div id="inicio">
   <h1>Peques, bienvenidas a Prácticas del lenguaje</h1>
   <div><img src="carpincho.png" alt="Carpincho"><img src="unicornio.png" alt="Unicornio"></div>
-  <h2>¿Quién va a jugar?</h2>
-  <input type="text" id="nombre" placeholder="Escribí tu nombre">
+  <button onclick="mostrar('elegirNombre')">Empezar a jugar</button>
+</div>
+
+<!-- ELEGIR NOMBRE -->
+<div id="elegirNombre" style="display:none;">
+  <h1>¿Quién va a jugar?</h1>
+  <button onclick="elegirNombre('Lucía')">Lucía</button>
+  <button onclick="elegirNombre('Sofía')">Sofía</button>
   <br><br>
-  <button onclick="guardarNombre()">¡Empiezan a jugar!</button>
-</section>
+  <button onclick="reiniciar()">Reiniciar progreso</button><br><br>
+  <button onclick="mostrar('inicio')">Volver</button>
+</div>
 
 <!-- MENÚ PRINCIPAL -->
-<section id="menuPrincipal" style="display:none;">
+<div id="menuPrincipal" style="display:none;">
   <h1 id="saludo"></h1>
   <div class="btn-grid" id="botonesCategorias"></div>
-  <br>
-  <button onclick="mostrar('pantallaInicio')">Volver al inicio</button>
-</section>
+  <button onclick="mostrar('elegirNombre')">Volver</button>
+</div>
 
 <!-- CONTENIDO DE CATEGORÍA -->
-<section id="contenidoTema" style="display:none;">
+<div id="contenidoTema" style="display:none;">
   <h1 id="tituloCategoria"></h1>
   <p id="explicacionCategoria"></p>
   <div class="barra"><div id="barraNivel" class="barra-interna"></div></div>
@@ -84,118 +90,179 @@
   <div id="opciones"></div>
   <p id="mensajeRespuesta" class="mensaje"></p>
   <button onclick="mostrar('menuPrincipal')">Volver</button>
-</section>
+</div>
 
 <script>
 let nombre = "", puntaje = 0, nivel = 1;
 let actualCategoria = "", actualPregunta = {};
-const bancos = {
-  "Mayúsculas y minúsculas": [
-    { texto: "¿Cuál está bien escrito?", opciones: ["juan", "Juan", "JUAN"], correcta: 1 },
-    { texto: "¿Cuál está bien escrito?", opciones: ["pedro", "PEDRO", "Pedro"], correcta: 2 },
-    { texto: "¿Cuál está bien escrito?", opciones: ["maría", "Maria", "María"], correcta: 2 },
-    { texto: "¿Cuál está bien escrito?", opciones: ["LUIS", "Luis", "luis"], correcta: 1 },
-    { texto: "¿Cuál está bien escrito?", opciones: ["ana", "ANA", "Ana"], correcta: 2 },
-    // (Agregá 45 más aquí)
-  ],
-  "¿B o V?": [
-    { texto: "¿Cómo se escribe correctamente?", opciones: ["baca", "vaca", "vaka"], correcta: 1 },
-    { texto: "¿Cómo se escribe correctamente?", opciones: ["bello", "vello", "bello"], correcta: 0 },
-    { texto: "¿Cómo se escribe correctamente?", opciones: ["bote", "vote", "voto"], correcta: 0 },
-    { texto: "¿Cómo se escribe correctamente?", opciones: ["vien", "bien", "bjen"], correcta: 1 },
-    { texto: "¿Cómo se escribe correctamente?", opciones: ["bida", "vida", "vda"], correcta: 1 },
-    // (Agregá 45 más aquí)
-  ],
-  // Agregá aquí las demás categorías (con 50 preguntas únicas por cada una)
-};
-
 const explicaciones = {
   "Mayúsculas y minúsculas": "Las mayúsculas se usan para comenzar nombres propios y al inicio de una oración.",
   "¿B o V?": "Algunas palabras llevan B, otras V. ¡Aprendamos cuál va!",
-  // (Completá con todas las explicaciones)
+  "¿C o S?": "Estas letras suenan parecido pero se escriben distinto.",
+  "¿G o J?": "Aprendé cuándo se usa la G y cuándo la J.",
+  "Palabras con H": "La H es muda, pero se escribe en muchas palabras.",
+  "Sustantivos propios": "Nombres de personas, lugares o instituciones.",
+  "Sustantivos comunes": "Nombres generales de cosas, animales o personas.",
+  "Singular y plural": "Singular es uno. Plural es más de uno."
 };
 
-function mostrar(id) {
-  document.querySelectorAll("section").forEach(sec => sec.style.display = "none");
-  document.getElementById(id).style.display = "block";
+const bancos = {
+  "Mayúsculas y minúsculas": [
+    { texto: "¿Cuál está bien escrita?", opciones: ["juan", "Juan", "JUAN"], correcta: 1 },
+    { texto: "¿Cuál está bien escrita?", opciones: ["maria", "MARIA", "María"], correcta: 2 },
+    { texto: "¿Cuál está bien escrita?", opciones: ["pedro", "Pedro", "PEDRO"], correcta: 1 },
+    { texto: "¿Cuál está bien escrita?", opciones: ["ana", "Ana", "ANA"], correcta: 1 },
+    { texto: "¿Cuál está bien escrita?", opciones: ["laura", "Laura", "LAURA"], correcta: 1 },
+    { texto: "¿Cuál está bien escrita?", opciones: ["diego", "Diego", "DIEGO"], correcta: 1 },
+    { texto: "¿Cuál está bien escrita?", opciones: ["martin", "Martín", "MARTÍN"], correcta: 1 },
+    { texto: "¿Cuál está bien escrita?", opciones: ["lucia", "Lucía", "LUCÍA"], correcta: 1 },
+    { texto: "¿Cuál está bien escrita?", opciones: ["sara", "Sara", "SARA"], correcta: 1 },
+    { texto: "¿Cuál está bien escrita?", opciones: ["sofia", "Sofía", "SOFÍA"], correcta: 1 },
+    // Continúan hasta 50...
+  ],
+
+  "¿B o V?": [
+    { texto: "¿Cómo se escribe?", opciones: ["baca", "vaca", "vaka"], correcta: 1 },
+    { texto: "¿Cómo se escribe?", opciones: ["bever", "beber", "veber"], correcta: 1 },
+    { texto: "¿Cómo se escribe?", opciones: ["bentana", "ventana", "ventanna"], correcta: 1 },
+    { texto: "¿Cómo se escribe?", opciones: ["bida", "vida", "biva"], correcta: 1 },
+    { texto: "¿Cómo se escribe?", opciones: ["barco", "varco", "barko"], correcta: 0 },
+    // Continúan hasta 50...
+  ],
+
+  // El resto se incluyen en la Parte 2...
+};
+  // Continúa completando los bancos
+  bancos["¿C o S?"] = [
+    { texto: "¿Cuál es correcta?", opciones: ["cielo", "sielo", "zielo"], correcta: 0 },
+    { texto: "¿Cuál es correcta?", opciones: ["casa", "caza", "sasa"], correcta: 0 },
+    { texto: "¿Cuál es correcta?", opciones: ["ciento", "siento", "ziento"], correcta: 0 },
+    { texto: "¿Cuál es correcta?", opciones: ["cena", "sena", "zena"], correcta: 0 },
+    { texto: "¿Cuál es correcta?", opciones: ["cero", "sero", "siero"], correcta: 0 },
+    // Continúan hasta 50...
+  ];
+
+  bancos["¿G o J?"] = [
+    { texto: "¿Cómo se escribe?", opciones: ["girasol", "jirasol", "hirasol"], correcta: 0 },
+    { texto: "¿Cómo se escribe?", opciones: ["juguete", "jugete", "juguehte"], correcta: 0 },
+    { texto: "¿Cómo se escribe?", opciones: ["jirafa", "girafa", "jirapha"], correcta: 0 },
+    { texto: "¿Cómo se escribe?", opciones: ["gente", "jente", "ghente"], correcta: 0 },
+    { texto: "¿Cómo se escribe?", opciones: ["jugo", "gugo", "juggo"], correcta: 0 },
+    // Continúan hasta 50...
+  ];
+
+  bancos["Palabras con H"] = [
+    { texto: "¿Cuál lleva H?", opciones: ["ola", "hola", "olaa"], correcta: 1 },
+    { texto: "¿Cuál lleva H?", opciones: ["echo", "hecho", "ejo"], correcta: 1 },
+    { texto: "¿Cuál lleva H?", opciones: ["umano", "humano", "jumano"], correcta: 1 },
+    { texto: "¿Cuál lleva H?", opciones: ["uevo", "huevo", "guevo"], correcta: 1 },
+    { texto: "¿Cuál lleva H?", opciones: ["hablar", "ablar", "javlar"], correcta: 0 },
+    // Continúan hasta 50...
+  ];
+
+  bancos["Sustantivos propios"] = [
+    { texto: "¿Cuál es un sustantivo propio?", opciones: ["Perro", "María", "silla"], correcta: 1 },
+    { texto: "¿Cuál es un sustantivo propio?", opciones: ["Juan", "pelota", "nube"], correcta: 0 },
+    { texto: "¿Cuál es un sustantivo propio?", opciones: ["Escuela San Martín", "escuela", "clase"], correcta: 0 },
+    { texto: "¿Cuál es un sustantivo propio?", opciones: ["Argentina", "país", "continente"], correcta: 0 },
+    { texto: "¿Cuál es un sustantivo propio?", opciones: ["Luna", "astro", "estrella"], correcta: 0 },
+    // Continúan hasta 50...
+  ];
+
+  bancos["sustantivos comunes"] = [
+    { texto: "¿Cuál es un sustantivo común?", opciones: ["niña", "Lucía", "Mar del Plata"], correcta: 0 },
+    { texto: "¿Cuál es un sustantivo común?", opciones: ["flor", "Flor", "Flora"], correcta: 0 },
+    { texto: "¿Cuál es un sustantivo común?", opciones: ["perro", "Toby", "Chiquito"], correcta: 0 },
+    { texto: "¿Cuál es un sustantivo común?", opciones: ["libro", "Don Quijote", "Harry Potter"], correcta: 0 },
+    { texto: "¿Cuál es un sustantivo común?", opciones: ["ciudad", "Buenos Aires", "La Plata"], correcta: 0 },
+    // Continúan hasta 50...
+  ];
+
+  bancos["Singular y plural"] = [
+    { texto: "¿Cuál es plural?", opciones: ["perros", "perro", "perra"], correcta: 0 },
+    { texto: "¿Cuál es singular?", opciones: ["gato", "gatos", "gatitos"], correcta: 0 },
+    { texto: "¿Cuál es plural?", opciones: ["manzanas", "manzana", "banana"], correcta: 0 },
+    { texto: "¿Cuál es singular?", opciones: ["nube", "nubes", "nubarrones"], correcta: 0 },
+    { texto: "¿Cuál es plural?", opciones: ["niñas", "niña", "niñita"], correcta: 0 },
+    // Continúan hasta 50...
+  ];
+
+function mostrar(seccion) {
+  document.querySelectorAll("div").forEach(d => d.style.display = "none");
+  document.getElementById(seccion).style.display = "block";
 }
 
-function guardarNombre() {
-  const input = document.getElementById("nombre");
-  nombre = input.value.trim();
-  if (!nombre) {
-    alert("Por favor, escribí tu nombre.");
-    return;
-  }
-  localStorage.setItem("peques_nombre", nombre);
-  document.getElementById("saludo").innerText = `Hola, ${nombre}. ¿Qué querés practicar hoy?`;
+function elegirNombre(nom) {
+  nombre = nom;
+  puntaje = 0;
+  nivel = 1;
+  actualizarBarra();
+  document.getElementById("saludo").innerText = `¡Hola ${nombre}! Elegí una categoría:`;
+  generarBotonesCategoria();
   mostrar("menuPrincipal");
 }
 
-function iniciarCategoria(categoria) {
+function generarBotonesCategoria() {
+  const cont = document.getElementById("botonesCategorias");
+  cont.innerHTML = "";
+  for (let cat in bancos) {
+    const btn = document.createElement("button");
+    btn.textContent = cat;
+    btn.onclick = () => cargarCategoria(cat);
+    cont.appendChild(btn);
+  }
+}
+
+function cargarCategoria(categoria) {
   actualCategoria = categoria;
   document.getElementById("tituloCategoria").innerText = categoria;
   document.getElementById("explicacionCategoria").innerText = explicaciones[categoria] || "";
-  document.getElementById("mensajeRespuesta").innerText = "";
   mostrar("contenidoTema");
   siguientePregunta();
 }
 
 function siguientePregunta() {
-  const arr = bancos[actualCategoria];
-  actualPregunta = arr[Math.floor(Math.random() * arr.length)];
+  const preguntas = bancos[actualCategoria];
+  actualPregunta = preguntas[Math.floor(Math.random() * preguntas.length)];
   document.getElementById("preguntaTexto").innerText = actualPregunta.texto;
-  document.getElementById("opciones").innerHTML = "";
+  const cont = document.getElementById("opciones");
+  cont.innerHTML = "";
   actualPregunta.opciones.forEach((op, i) => {
     const btn = document.createElement("button");
-    btn.innerText = op;
+    btn.textContent = op;
     btn.onclick = () => verificarRespuesta(i);
-    document.getElementById("opciones").appendChild(btn);
+    cont.appendChild(btn);
   });
-  actualizarBarra();
-  document.getElementById("puntaje").innerText = `Puntaje: ${puntaje} · Nivel: ${nivel}`;
+  document.getElementById("mensajeRespuesta").innerText = "";
 }
 
 function verificarRespuesta(indice) {
-  const msg = document.getElementById("mensajeRespuesta");
   if (indice === actualPregunta.correcta) {
+    document.getElementById("mensajeRespuesta").innerText = "¡Muy bien!";
+    document.getElementById("mensajeRespuesta").className = "mensaje";
     puntaje++;
-    msg.innerText = "¡Muy bien!";
-    msg.className = "mensaje";
     if (puntaje % 10 === 0) nivel++;
-    setTimeout(() => {
-      msg.innerText = "";
-      siguientePregunta();
-    }, 1000);
+    actualizarBarra();
   } else {
-    msg.innerText = "Ups... Intentá de nuevo.";
-    msg.className = "mensaje error";
+    document.getElementById("mensajeRespuesta").innerText = "¡Ups! Esa no es.";
+    document.getElementById("mensajeRespuesta").className = "mensaje error";
   }
-  actualizarBarra();
-  document.getElementById("puntaje").innerText = `Puntaje: ${puntaje} · Nivel: ${nivel}`;
+  setTimeout(siguientePregunta, 1000);
 }
 
 function actualizarBarra() {
-  const barra = document.getElementById("barraNivel");
-  const progreso = (puntaje % 10) * 10;
-  barra.style.width = progreso + "%";
+  const porcentaje = Math.min(100, (puntaje % 10) * 10);
+  document.getElementById("barraNivel").style.width = porcentaje + "%";
+  document.getElementById("puntaje").innerText = `Nivel: ${nivel} | Respuestas correctas: ${puntaje}`;
 }
 
-window.onload = () => {
-  const guardado = localStorage.getItem("peques_nombre");
-  if (guardado) {
-    nombre = guardado;
-    document.getElementById("saludo").innerText = `Hola, ${nombre}. ¿Qué querés practicar hoy?`;
-    mostrar("menuPrincipal");
-  }
-  const botones = Object.keys(bancos).map(cat => {
-    const btn = document.createElement("button");
-    btn.innerText = cat;
-    btn.onclick = () => iniciarCategoria(cat);
-    return btn;
-  });
-  botones.forEach(b => document.getElementById("botonesCategorias").appendChild(b));
-};
+function reiniciar() {
+  puntaje = 0;
+  nivel = 1;
+  actualizarBarra();
+  alert("¡Puntaje reiniciado!");
+}
 </script>
+
 </body>
 </html>
