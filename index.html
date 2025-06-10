@@ -47,9 +47,11 @@
       font-weight: bold;
       font-size: 20px;
       margin: 10px;
+      color: green;
     }
-    .mensaje.correcto { color: green; }
-    .mensaje.error { color: red; }
+    .error {
+      color: red;
+    }
   </style>
 </head>
 <body>
@@ -77,7 +79,6 @@
   <div class="btn-grid" id="botonesCategorias"></div>
   <button onclick="mostrar('elegirNombre')">Volver</button>
 </div>
-
 <!-- CONTENIDO DE CATEGORÍA -->
 <div id="contenidoTema" style="display:none;">
   <h1 id="tituloCategoria"></h1>
@@ -91,164 +92,177 @@
 </div>
 
 <script>
-  let nombre = "", puntaje = 0, nivel = 1;
-  let actualCategoria = "", actualPregunta = {};
-  const bancos = {
-    "Mayúsculas y minúsculas": Array(50).fill().map((_, i) => ({
-      texto: `¿Cuál está bien? Ej. #${i+1}`,
-      opciones: ["juan", "Juan", "JUAN"],
-      correcta: 1
-    })),
-    "¿B o V?": Array(50).fill().map((_, i) => ({
-      texto: `¿Cómo se escribe la palabra #${i+1}?`,
-      opciones: ["baca", "vaca", "vaka"],
-      correcta: 1
-    })),
-    "¿S, Z o C?": Array(50).fill().map((_, i) => ({
-      texto: `¿Qué letra es correcta en palabra #${i+1}?`,
-      opciones: ["s", "z", "c"],
-      correcta: Math.floor(Math.random() * 3)
-    })),
-    "¿Cuándo usar la letra H?": Array(50).fill().map((_, i) => ({
-      texto: `¿Lleva H la palabra #${i+1}?`,
-      opciones: ["ola", "hola", "ola"],
-      correcta: 1
-    })),
-    "Separar palabras": Array(50).fill().map((_, i) => ({
-      texto: `¿Está bien separado? #${i+1}`,
-      opciones: ["Globo rojo", "Globorojo", "Glo bo rojo"],
-      correcta: 0
-    })),
-    "Agudas, graves, esdrújulas": Array(50).fill().map((_, i) => ({
-      texto: `¿Qué clase es la palabra #${i+1}?`,
-      opciones: ["Aguda", "Grave", "Esdrújula"],
-      correcta: Math.floor(Math.random() * 3)
-    })),
-    "Porque, por qué, porqué y por que": Array(50).fill().map((_, i) => ({
-      texto: `¿Qué forma usarías al contestar #${i+1}?`,
-      opciones: ["porque", "por qué", "porqué", "por que"],
-      correcta: 0
-    })),
-    "Sustantivos": Array(50).fill().map((_, i) => ({
-      texto: `¿Cuál es un sustantivo #${i+1}?`,
-      opciones: ["correr", "flor", "grande"],
-      correcta: 1
-    })),
-    "Plural y singular": Array(50).fill().map((_, i) => ({
-      texto: `¿Cuál es plural #${i+1}?`,
-      opciones: ["casa", "casas", "casita"],
-      correcta: 1
-    })),
-    "Pronombres": Array(50).fill().map((_, i) => ({
-      texto: `¿Qué pronombre corresponde #${i+1}?`,
-      opciones: ["Ella", "Nosotros", "Tú"],
-      correcta: Math.floor(Math.random() * 3)
-    }))
-  };
+let nombre = "", puntaje = 0, nivel = 1;
+let actualCategoria = "", actualPregunta = {};
 
-  const explicaciones = {
-    "Mayúsculas y minúsculas": "Las mayúsculas se usan para comenzar nombres propios y al inicio de una oración.",
-    "¿B o V?": "Algunas palabras llevan B, otras V. ¡Aprendamos cuál va!",
-    "¿S, Z o C?": "Estas letras suenan parecido pero se escriben distinto.",
-    "¿Cuándo usar la letra H?": "La H es muda, pero se escribe en muchas palabras.",
-    "Separar palabras": "Aprendamos cuándo una palabra es una o varias.",
-    "Agudas, graves, esdrújulas": "Según cómo se acentúan, cambian de nombre.",
-    "Porque, por qué, porqué y por que": "Parecen iguales, pero tienen usos distintos.",
-    "Sustantivos": "Los sustantivos nombran cosas, personas o lugares.",
-    "Plural y singular": "Singular es uno. Plural es más de uno.",
-    "Pronombres": "Los usamos para hablar de personas sin decir sus nombres."
-  };
+function mostrar(id) {
+  document.querySelectorAll("body > div").forEach(d => d.style.display = "none");
+  document.getElementById(id).style.display = "block";
+}
 
-  function mostrar(id) {
-    document.querySelectorAll("body > div").forEach(d => d.style.display = "none");
-    document.getElementById(id).style.display = "block";
+function elegirNombre(nom) {
+  nombre = nom;
+  localStorage.setItem("peques_nombre", nombre);
+  mostrar("menuPrincipal");
+  document.getElementById("saludo").innerText = `Hola, ${nombre}. ¿Qué te gustaría elegir?`;
+}
+
+function reiniciar() {
+  localStorage.removeItem("peques_nombre");
+  location.reload();
+}
+
+function iniciarCategoria(categoria) {
+  actualCategoria = categoria;
+  document.getElementById("tituloCategoria").innerText = "Hoy veremos: " + categoria;
+  document.getElementById("explicacionCategoria").innerText = explicaciones[categoria] || "";
+  document.getElementById("mensajeRespuesta").innerText = "";
+  mostrar("contenidoTema");
+  siguientePregunta();
+}
+
+function siguientePregunta() {
+  const arr = bancos[actualCategoria];
+  actualPregunta = arr[Math.floor(Math.random() * arr.length)];
+  document.getElementById("preguntaTexto").innerText = actualPregunta.texto;
+  document.getElementById("opciones").innerHTML = "";
+  actualPregunta.opciones.forEach((op, i) => {
+    const btn = document.createElement("button");
+    btn.innerText = op;
+    btn.onclick = () => verificarRespuesta(i);
+    document.getElementById("opciones").appendChild(btn);
+  });
+  actualizarBarra();
+  document.getElementById("puntaje").innerText = `Puntaje: ${puntaje} · Nivel: ${nivel}`;
+}
+
+function verificarRespuesta(indice) {
+  const msg = document.getElementById("mensajeRespuesta");
+  if (indice === actualPregunta.correcta) {
+    puntaje++;
+    msg.innerText = "¡Muy bien!";
+    msg.className = "mensaje";
+    if (puntaje % 10 === 0) nivel++;
+    actualizarBarra();
+    document.getElementById("puntaje").innerText = `Puntaje: ${puntaje} · Nivel: ${nivel}`;
+    setTimeout(() => {
+      msg.innerText = "";
+      siguientePregunta();
+    }, 1000);
+  } else {
+    msg.innerText = "Ups... Intentá de nuevo.";
+    msg.className = "mensaje error";
   }
+}
 
-  function elegirNombre(nom) {
-    nombre = nom;
-    localStorage.setItem("peques_nombre", nombre);
+function actualizarBarra() {
+  const barra = document.getElementById("barraNivel");
+  const progreso = (puntaje % 10) * 10;
+  barra.style.width = progreso + "%";
+}
+<script>
+const nombres = ["Juan", "María", "Pedro", "Lucía", "Sofía", "Carlos", "Ana", "Luis", "Camila", "Diego", "Paula", "Tomás", "Martina", "Esteban", "Valentina", "Ramiro", "Julieta", "Mateo", "Agustina", "Lautaro", "Bautista", "Emilia", "Santiago", "Renata", "Joaquín", "Isabella", "Benjamín", "Catalina", "Felipe", "Milagros", "Thiago", "Abril", "Franco", "Malena", "Andrés", "Guadalupe", "Iván", "Florencia", "Gabriel", "Bianca", "Maximiliano", "Lola", "Julián", "Brisa", "Axel", "Aitana", "Dante", "Eva", "Gael", "Mía"];
+
+const bancos = {
+  "Mayúsculas y minúsculas": nombres.map((nom, i) => ({
+    texto: `¿Cuál está bien escrita? Ej. #${i+1}`,
+    opciones: [nom.toLowerCase(), nom, nom.toUpperCase()],
+    correcta: 1
+  })),
+  "¿B o V?": Array(50).fill().map((_, i) => {
+    const palabras = [
+      ["baca", "vaca", "vaka"],
+      ["banco", "vanco", "banco"],
+      ["bello", "vello", "bello"],
+      ["botella", "votella", "boteya"],
+      ["bastar", "vastar", "basttar"]
+    ];
+    const set = palabras[i % palabras.length];
+    return {
+      texto: `¿Cómo se escribe correctamente? Ej. #${i+1}`,
+      opciones: set,
+      correcta: 0
+    };
+  }),
+  "¿S, Z o C?": Array(50).fill().map((_, i) => {
+    const palabras = [
+      { texto: `¿Cómo se escribe: ...apo? Ej. #${i+1}`, opciones: ["sapo", "zapo", "capo"], correcta: 0 },
+      { texto: `¿Cómo se escribe: ...ebra? Ej. #${i+1}`, opciones: ["cebra", "sebra", "zebra"], correcta: 0 },
+      { texto: `¿Cómo se escribe: ...anahoria? Ej. #${i+1}`, opciones: ["zanahoria", "canahoria", "sanahoria"], correcta: 0 }
+    ];
+    return palabras[i % palabras.length];
+  }),
+  "¿Cuándo usar la letra H?": Array(50).fill().map((_, i) => ({
+    texto: `¿Cuál está bien escrita? Ej. #${i+1}`,
+    opciones: ["ola", "hola", "olla"],
+    correcta: 1
+  })),
+  "Separar palabras": Array(50).fill().map((_, i) => ({
+    texto: `¿Está bien separada la frase? Ej. #${i+1}`,
+    opciones: ["Casa grande", "Casagrande", "Ca sa grande"],
+    correcta: 0
+  })),
+  "Agudas, graves, esdrújulas": Array(50).fill().map((_, i) => {
+    const opciones = ["Aguda", "Grave", "Esdrújula"];
+    const correcta = i % 3;
+    return {
+      texto: `¿Qué tipo de palabra es 'ejemplo${i + 1}'?`,
+      opciones: opciones,
+      correcta: correcta
+    };
+  }),
+  "Porque, por qué, porqué y por que": Array(50).fill().map((_, i) => ({
+    texto: `¿Cuál corresponde si quiero responder algo? Ej. #${i+1}`,
+    opciones: ["porque", "por qué", "porqué", "por que"],
+    correcta: 0
+  })),
+  "Sustantivos": Array(50).fill().map((_, i) => ({
+    texto: `¿Cuál es un sustantivo? Ej. #${i+1}`,
+    opciones: ["grande", "correr", nombres[i % nombres.length]],
+    correcta: 2
+  })),
+  "Plural y singular": Array(50).fill().map((_, i) => ({
+    texto: `¿Cuál es plural? Ej. #${i+1}`,
+    opciones: ["flor", "flores", "florcita"],
+    correcta: 1
+  })),
+  "Pronombres": Array(50).fill().map((_, i) => {
+    const opciones = ["Él", "Ella", "Nosotros", "Tú", "Yo"];
+    const correcta = i % opciones.length;
+    return {
+      texto: `¿Cuál es un pronombre? Ej. #${i+1}`,
+      opciones: opciones,
+      correcta: correcta
+    };
+  })
+};
+
+const explicaciones = {
+  "Mayúsculas y minúsculas": "Las mayúsculas se usan para comenzar nombres propios y al inicio de una oración.",
+  "¿B o V?": "Algunas palabras llevan B, otras V. ¡Aprendamos cuál va!",
+  "¿S, Z o C?": "Estas letras suenan parecido pero se escriben distinto.",
+  "¿Cuándo usar la letra H?": "La H es muda, pero se escribe en muchas palabras.",
+  "Separar palabras": "Aprendamos cuándo una palabra es una o varias.",
+  "Agudas, graves, esdrújulas": "Según cómo se acentúan, cambian de nombre.",
+  "Porque, por qué, porqué y por que": "Parecen iguales, pero tienen usos distintos.",
+  "Sustantivos": "Los sustantivos nombran cosas, personas o lugares.",
+  "Plural y singular": "Singular es uno. Plural es más de uno.",
+  "Pronombres": "Los usamos para hablar de personas sin decir sus nombres."
+};
+
+window.onload = function() {
+  const guardado = localStorage.getItem("peques_nombre");
+  if (guardado) {
+    nombre = guardado;
     mostrar("menuPrincipal");
     document.getElementById("saludo").innerText = `Hola, ${nombre}. ¿Qué te gustaría elegir?`;
   }
-
-  function reiniciar() {
-    localStorage.removeItem("peques_nombre");
-    location.reload();
-  }
-
-  function iniciarCategoria(categoria) {
-    actualCategoria = categoria;
-    document.getElementById("tituloCategoria").innerText = "Hoy veremos: " + categoria;
-    document.getElementById("explicacionCategoria").innerText = explicaciones[categoria] || "";
-    document.getElementById("mensajeRespuesta").innerText = "";
-    mostrar("contenidoTema");
-    siguientePregunta();
-  }
-
-  function siguientePregunta() {
-    const arr = bancos[actualCategoria];
-    let nueva;
-    do {
-      nueva = arr[Math.floor(Math.random() * arr.length)];
-    } while (nueva === actualPregunta);
-    actualPregunta = nueva;
-
-    document.getElementById("preguntaTexto").innerText = actualPregunta.texto;
-
-    const opcionesDiv = document.getElementById("opciones");
-    opcionesDiv.innerHTML = ""; // Limpiar las opciones anteriores
-
-    actualPregunta.opciones.forEach((op, i) => {
-      const btn = document.createElement("button");
-      btn.textContent = op;
-      btn.onclick = () => verificarRespuesta(i);
-      opcionesDiv.appendChild(btn);
-    });
-
-    actualizarBarra();
-    document.getElementById("puntaje").innerText = `Puntaje: ${puntaje} · Nivel: ${nivel}`;
-  }
-
-  function verificarRespuesta(indice) {
-    const msg = document.getElementById("mensajeRespuesta");
-    if (indice === actualPregunta.correcta) {
-      puntaje++;
-      msg.innerText = "¡Muy bien!";
-      msg.className = "mensaje correcto";
-      if (puntaje % 10 === 0) nivel++;
-      actualizarBarra();
-      document.getElementById("puntaje").innerText = `Puntaje: ${puntaje} · Nivel: ${nivel}`;
-      setTimeout(() => {
-        msg.innerText = "";
-        siguientePregunta();
-      }, 1000);
-    } else {
-      msg.innerText = "Ups... Intentá de nuevo.";
-      msg.className = "mensaje error";
-    }
-  }
-
-  function actualizarBarra() {
-    const barra = document.getElementById("barraNivel");
-    const progreso = (puntaje % 10) * 10;
-    barra.style.width = progreso + "%";
-  }
-
-  window.onload = function() {
-    const guardado = localStorage.getItem("peques_nombre");
-    if (guardado) {
-      nombre = guardado;
-      mostrar("menuPrincipal");
-      document.getElementById("saludo").innerText = `Hola, ${nombre}. ¿Qué te gustaría elegir?`;
-    }
-    const botones = Object.keys(bancos).map(cat => {
-      const btn = document.createElement("button");
-      btn.innerText = cat;
-      btn.onclick = () => iniciarCategoria(cat);
-      return btn;
-    });
-    botones.forEach(b => document.getElementById("botonesCategorias").appendChild(b));
-  };
+  const botones = Object.keys(bancos).map(cat => {
+    const btn = document.createElement("button");
+    btn.innerText = cat;
+    btn.onclick = () => iniciarCategoria(cat);
+    return btn;
+  });
+  botones.forEach(b => document.getElementById("botonesCategorias").appendChild(b));
+};
 </script>
-</body>
-</html>
