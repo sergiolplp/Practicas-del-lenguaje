@@ -56,31 +56,26 @@
 </head>
 <body>
 
-<!-- INICIO -->
-<div id="inicio">
+<!-- PANTALLA INICIO -->
+<section id="pantallaInicio">
   <h1>Peques, bienvenidas a Prácticas del lenguaje</h1>
   <div><img src="carpincho.png" alt="Carpincho"><img src="unicornio.png" alt="Unicornio"></div>
-  <button onclick="mostrar('elegirNombre')">Empezar a jugar</button>
-</div>
-
-<!-- ELEGIR NOMBRE -->
-<div id="elegirNombre" style="display:none;">
-  <h1>¿Quién va a jugar?</h1>
-  <button onclick="elegirNombre('Lucía')">Lucía</button>
-  <button onclick="elegirNombre('Sofía')">Sofía</button>
+  <h2>¿Quién va a jugar?</h2>
+  <input type="text" id="nombre" placeholder="Escribí tu nombre">
   <br><br>
-  <button onclick="reiniciar()">Reiniciar progreso</button><br><br>
-  <button onclick="mostrar('inicio')">Volver</button>
-</div>
+  <button onclick="guardarNombre()">¡Empiezan a jugar!</button>
+</section>
 
 <!-- MENÚ PRINCIPAL -->
-<div id="menuPrincipal" style="display:none;">
+<section id="menuPrincipal" style="display:none;">
   <h1 id="saludo"></h1>
   <div class="btn-grid" id="botonesCategorias"></div>
-  <button onclick="mostrar('elegirNombre')">Volver</button>
-</div>
+  <br>
+  <button onclick="mostrar('pantallaInicio')">Volver al inicio</button>
+</section>
+
 <!-- CONTENIDO DE CATEGORÍA -->
-<div id="contenidoTema" style="display:none;">
+<section id="contenidoTema" style="display:none;">
   <h1 id="tituloCategoria"></h1>
   <p id="explicacionCategoria"></p>
   <div class="barra"><div id="barraNivel" class="barra-interna"></div></div>
@@ -89,32 +84,57 @@
   <div id="opciones"></div>
   <p id="mensajeRespuesta" class="mensaje"></p>
   <button onclick="mostrar('menuPrincipal')">Volver</button>
-</div>
+</section>
 
 <script>
 let nombre = "", puntaje = 0, nivel = 1;
 let actualCategoria = "", actualPregunta = {};
+const bancos = {
+  "Mayúsculas y minúsculas": [
+    { texto: "¿Cuál está bien escrito?", opciones: ["juan", "Juan", "JUAN"], correcta: 1 },
+    { texto: "¿Cuál está bien escrito?", opciones: ["pedro", "PEDRO", "Pedro"], correcta: 2 },
+    { texto: "¿Cuál está bien escrito?", opciones: ["maría", "Maria", "María"], correcta: 2 },
+    { texto: "¿Cuál está bien escrito?", opciones: ["LUIS", "Luis", "luis"], correcta: 1 },
+    { texto: "¿Cuál está bien escrito?", opciones: ["ana", "ANA", "Ana"], correcta: 2 },
+    // (Agregá 45 más aquí)
+  ],
+  "¿B o V?": [
+    { texto: "¿Cómo se escribe correctamente?", opciones: ["baca", "vaca", "vaka"], correcta: 1 },
+    { texto: "¿Cómo se escribe correctamente?", opciones: ["bello", "vello", "bello"], correcta: 0 },
+    { texto: "¿Cómo se escribe correctamente?", opciones: ["bote", "vote", "voto"], correcta: 0 },
+    { texto: "¿Cómo se escribe correctamente?", opciones: ["vien", "bien", "bjen"], correcta: 1 },
+    { texto: "¿Cómo se escribe correctamente?", opciones: ["bida", "vida", "vda"], correcta: 1 },
+    // (Agregá 45 más aquí)
+  ],
+  // Agregá aquí las demás categorías (con 50 preguntas únicas por cada una)
+};
+
+const explicaciones = {
+  "Mayúsculas y minúsculas": "Las mayúsculas se usan para comenzar nombres propios y al inicio de una oración.",
+  "¿B o V?": "Algunas palabras llevan B, otras V. ¡Aprendamos cuál va!",
+  // (Completá con todas las explicaciones)
+};
 
 function mostrar(id) {
-  document.querySelectorAll("body > div").forEach(d => d.style.display = "none");
+  document.querySelectorAll("section").forEach(sec => sec.style.display = "none");
   document.getElementById(id).style.display = "block";
 }
 
-function elegirNombre(nom) {
-  nombre = nom;
+function guardarNombre() {
+  const input = document.getElementById("nombre");
+  nombre = input.value.trim();
+  if (!nombre) {
+    alert("Por favor, escribí tu nombre.");
+    return;
+  }
   localStorage.setItem("peques_nombre", nombre);
+  document.getElementById("saludo").innerText = `Hola, ${nombre}. ¿Qué querés practicar hoy?`;
   mostrar("menuPrincipal");
-  document.getElementById("saludo").innerText = `Hola, ${nombre}. ¿Qué te gustaría elegir?`;
-}
-
-function reiniciar() {
-  localStorage.removeItem("peques_nombre");
-  location.reload();
 }
 
 function iniciarCategoria(categoria) {
   actualCategoria = categoria;
-  document.getElementById("tituloCategoria").innerText = "Hoy veremos: " + categoria;
+  document.getElementById("tituloCategoria").innerText = categoria;
   document.getElementById("explicacionCategoria").innerText = explicaciones[categoria] || "";
   document.getElementById("mensajeRespuesta").innerText = "";
   mostrar("contenidoTema");
@@ -143,8 +163,6 @@ function verificarRespuesta(indice) {
     msg.innerText = "¡Muy bien!";
     msg.className = "mensaje";
     if (puntaje % 10 === 0) nivel++;
-    actualizarBarra();
-    document.getElementById("puntaje").innerText = `Puntaje: ${puntaje} · Nivel: ${nivel}`;
     setTimeout(() => {
       msg.innerText = "";
       siguientePregunta();
@@ -153,6 +171,8 @@ function verificarRespuesta(indice) {
     msg.innerText = "Ups... Intentá de nuevo.";
     msg.className = "mensaje error";
   }
+  actualizarBarra();
+  document.getElementById("puntaje").innerText = `Puntaje: ${puntaje} · Nivel: ${nivel}`;
 }
 
 function actualizarBarra() {
@@ -160,102 +180,13 @@ function actualizarBarra() {
   const progreso = (puntaje % 10) * 10;
   barra.style.width = progreso + "%";
 }
-<script>
-const nombres = ["Juan", "María", "Pedro", "Lucía", "Sofía", "Carlos", "Ana", "Luis", "Camila", "Diego", "Paula", "Tomás", "Martina", "Esteban", "Valentina", "Ramiro", "Julieta", "Mateo", "Agustina", "Lautaro", "Bautista", "Emilia", "Santiago", "Renata", "Joaquín", "Isabella", "Benjamín", "Catalina", "Felipe", "Milagros", "Thiago", "Abril", "Franco", "Malena", "Andrés", "Guadalupe", "Iván", "Florencia", "Gabriel", "Bianca", "Maximiliano", "Lola", "Julián", "Brisa", "Axel", "Aitana", "Dante", "Eva", "Gael", "Mía"];
 
-const bancos = {
-  "Mayúsculas y minúsculas": nombres.map((nom, i) => ({
-    texto: `¿Cuál está bien escrita? Ej. #${i+1}`,
-    opciones: [nom.toLowerCase(), nom, nom.toUpperCase()],
-    correcta: 1
-  })),
-  "¿B o V?": Array(50).fill().map((_, i) => {
-    const palabras = [
-      ["baca", "vaca", "vaka"],
-      ["banco", "vanco", "banco"],
-      ["bello", "vello", "bello"],
-      ["botella", "votella", "boteya"],
-      ["bastar", "vastar", "basttar"]
-    ];
-    const set = palabras[i % palabras.length];
-    return {
-      texto: `¿Cómo se escribe correctamente? Ej. #${i+1}`,
-      opciones: set,
-      correcta: 0
-    };
-  }),
-  "¿S, Z o C?": Array(50).fill().map((_, i) => {
-    const palabras = [
-      { texto: `¿Cómo se escribe: ...apo? Ej. #${i+1}`, opciones: ["sapo", "zapo", "capo"], correcta: 0 },
-      { texto: `¿Cómo se escribe: ...ebra? Ej. #${i+1}`, opciones: ["cebra", "sebra", "zebra"], correcta: 0 },
-      { texto: `¿Cómo se escribe: ...anahoria? Ej. #${i+1}`, opciones: ["zanahoria", "canahoria", "sanahoria"], correcta: 0 }
-    ];
-    return palabras[i % palabras.length];
-  }),
-  "¿Cuándo usar la letra H?": Array(50).fill().map((_, i) => ({
-    texto: `¿Cuál está bien escrita? Ej. #${i+1}`,
-    opciones: ["ola", "hola", "olla"],
-    correcta: 1
-  })),
-  "Separar palabras": Array(50).fill().map((_, i) => ({
-    texto: `¿Está bien separada la frase? Ej. #${i+1}`,
-    opciones: ["Casa grande", "Casagrande", "Ca sa grande"],
-    correcta: 0
-  })),
-  "Agudas, graves, esdrújulas": Array(50).fill().map((_, i) => {
-    const opciones = ["Aguda", "Grave", "Esdrújula"];
-    const correcta = i % 3;
-    return {
-      texto: `¿Qué tipo de palabra es 'ejemplo${i + 1}'?`,
-      opciones: opciones,
-      correcta: correcta
-    };
-  }),
-  "Porque, por qué, porqué y por que": Array(50).fill().map((_, i) => ({
-    texto: `¿Cuál corresponde si quiero responder algo? Ej. #${i+1}`,
-    opciones: ["porque", "por qué", "porqué", "por que"],
-    correcta: 0
-  })),
-  "Sustantivos": Array(50).fill().map((_, i) => ({
-    texto: `¿Cuál es un sustantivo? Ej. #${i+1}`,
-    opciones: ["grande", "correr", nombres[i % nombres.length]],
-    correcta: 2
-  })),
-  "Plural y singular": Array(50).fill().map((_, i) => ({
-    texto: `¿Cuál es plural? Ej. #${i+1}`,
-    opciones: ["flor", "flores", "florcita"],
-    correcta: 1
-  })),
-  "Pronombres": Array(50).fill().map((_, i) => {
-    const opciones = ["Él", "Ella", "Nosotros", "Tú", "Yo"];
-    const correcta = i % opciones.length;
-    return {
-      texto: `¿Cuál es un pronombre? Ej. #${i+1}`,
-      opciones: opciones,
-      correcta: correcta
-    };
-  })
-};
-
-const explicaciones = {
-  "Mayúsculas y minúsculas": "Las mayúsculas se usan para comenzar nombres propios y al inicio de una oración.",
-  "¿B o V?": "Algunas palabras llevan B, otras V. ¡Aprendamos cuál va!",
-  "¿S, Z o C?": "Estas letras suenan parecido pero se escriben distinto.",
-  "¿Cuándo usar la letra H?": "La H es muda, pero se escribe en muchas palabras.",
-  "Separar palabras": "Aprendamos cuándo una palabra es una o varias.",
-  "Agudas, graves, esdrújulas": "Según cómo se acentúan, cambian de nombre.",
-  "Porque, por qué, porqué y por que": "Parecen iguales, pero tienen usos distintos.",
-  "Sustantivos": "Los sustantivos nombran cosas, personas o lugares.",
-  "Plural y singular": "Singular es uno. Plural es más de uno.",
-  "Pronombres": "Los usamos para hablar de personas sin decir sus nombres."
-};
-
-window.onload = function() {
+window.onload = () => {
   const guardado = localStorage.getItem("peques_nombre");
   if (guardado) {
     nombre = guardado;
+    document.getElementById("saludo").innerText = `Hola, ${nombre}. ¿Qué querés practicar hoy?`;
     mostrar("menuPrincipal");
-    document.getElementById("saludo").innerText = `Hola, ${nombre}. ¿Qué te gustaría elegir?`;
   }
   const botones = Object.keys(bancos).map(cat => {
     const btn = document.createElement("button");
@@ -266,3 +197,5 @@ window.onload = function() {
   botones.forEach(b => document.getElementById("botonesCategorias").appendChild(b));
 };
 </script>
+</body>
+</html>
