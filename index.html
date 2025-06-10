@@ -76,9 +76,9 @@
 <!-- MENÚ PRINCIPAL -->
 <div id="menuPrincipal" style="display:none">
   <h2 id="saludo"></h2>
-  <div id="botonesCategorias" class="btn-grid"></div> <!-- ← cambio aquí -->
+  <div id="botonesCategorias" class="btn-grid"></div>
   <br>
-  <button onclick="mostrar('elegirNombre')">Volver</button>
+  <button onclick="mostrarMenu()">Volver</button>
 </div>
 
 <!-- CONTENIDO DE CATEGORÍA -->
@@ -90,12 +90,13 @@
   <p id="preguntaTexto"></p>
   <div id="opciones"></div>
   <p id="mensajeRespuesta" class="mensaje"></p>
-  <button onclick="mostrar('menuPrincipal')">Volver</button>
+  <button onclick="mostrarMenu()">Volver</button>
 </div>
 
 <script>
 let nombre = "", puntaje = 0, nivel = 1;
 let actualCategoria = "", actualPregunta = {};
+
 const explicaciones = {
   "Mayúsculas y minúsculas": "Las mayúsculas se usan para comenzar nombres propios y al inicio de una oración.",
   "¿B o V?": "Algunas palabras llevan B, otras V. ¡Aprendamos cuál va!",
@@ -114,79 +115,57 @@ const bancos = {
     { texto: "¿Cuál está bien escrita?", opciones: ["pedro", "Pedro", "PEDRO"], correcta: 1 },
     { texto: "¿Cuál está bien escrita?", opciones: ["ana", "Ana", "ANA"], correcta: 1 },
     { texto: "¿Cuál está bien escrita?", opciones: ["laura", "Laura", "LAURA"], correcta: 1 },
-    { texto: "¿Cuál está bien escrita?", opciones: ["diego", "Diego", "DIEGO"], correcta: 1 },
-    { texto: "¿Cuál está bien escrita?", opciones: ["martin", "Martín", "MARTÍN"], correcta: 1 },
-    { texto: "¿Cuál está bien escrita?", opciones: ["lucia", "Lucía", "LUCÍA"], correcta: 1 },
-    { texto: "¿Cuál está bien escrita?", opciones: ["sara", "Sara", "SARA"], correcta: 1 },
-    { texto: "¿Cuál está bien escrita?", opciones: ["sofia", "Sofía", "SOFÍA"], correcta: 1 },
-    // Continúan hasta 50...
   ],
-
   "¿B o V?": [
     { texto: "¿Cómo se escribe?", opciones: ["baca", "vaca", "vaka"], correcta: 1 },
-    { texto: "¿Cómo se escribe?", opciones: ["bever", "beber", "veber"], correcta: 1 },
-    { texto: "¿Cómo se escribe?", opciones: ["bentana", "ventana", "ventanna"], correcta: 1 },
-    { texto: "¿Cómo se escribe?", opciones: ["bida", "vida", "biva"], correcta: 1 },
+    { texto: "¿Cómo se escribe?", opciones: ["beber", "veber", "baber"], correcta: 0 },
+    { texto: "¿Cómo se escribe?", opciones: ["ventana", "bentana", "ventanna"], correcta: 0 },
+    { texto: "¿Cómo se escribe?", opciones: ["vida", "bida", "biva"], correcta: 0 },
     { texto: "¿Cómo se escribe?", opciones: ["barco", "varco", "barko"], correcta: 0 },
-    // Continúan hasta 50...
   ],
-
-  // El resto se incluyen en la Parte 2...
-};
-  // Continúa completando los bancos
-  bancos["¿C o S?"] = [
+  "¿C o S?": [
     { texto: "¿Cuál es correcta?", opciones: ["cielo", "sielo", "zielo"], correcta: 0 },
     { texto: "¿Cuál es correcta?", opciones: ["casa", "caza", "sasa"], correcta: 0 },
     { texto: "¿Cuál es correcta?", opciones: ["ciento", "siento", "ziento"], correcta: 0 },
     { texto: "¿Cuál es correcta?", opciones: ["cena", "sena", "zena"], correcta: 0 },
     { texto: "¿Cuál es correcta?", opciones: ["cero", "sero", "siero"], correcta: 0 },
-    // Continúan hasta 50...
-  ];
-
-  bancos["¿G o J?"] = [
+  ],
+  "¿G o J?": [
     { texto: "¿Cómo se escribe?", opciones: ["girasol", "jirasol", "hirasol"], correcta: 0 },
     { texto: "¿Cómo se escribe?", opciones: ["juguete", "jugete", "juguehte"], correcta: 0 },
     { texto: "¿Cómo se escribe?", opciones: ["jirafa", "girafa", "jirapha"], correcta: 0 },
     { texto: "¿Cómo se escribe?", opciones: ["gente", "jente", "ghente"], correcta: 0 },
     { texto: "¿Cómo se escribe?", opciones: ["jugo", "gugo", "juggo"], correcta: 0 },
-    // Continúan hasta 50...
-  ];
-
-  bancos["Palabras con H"] = [
+  ],
+  "Palabras con H": [
     { texto: "¿Cuál lleva H?", opciones: ["ola", "hola", "olaa"], correcta: 1 },
     { texto: "¿Cuál lleva H?", opciones: ["echo", "hecho", "ejo"], correcta: 1 },
     { texto: "¿Cuál lleva H?", opciones: ["umano", "humano", "jumano"], correcta: 1 },
     { texto: "¿Cuál lleva H?", opciones: ["uevo", "huevo", "guevo"], correcta: 1 },
     { texto: "¿Cuál lleva H?", opciones: ["hablar", "ablar", "javlar"], correcta: 0 },
-    // Continúan hasta 50...
-  ];
-
-  bancos["Sustantivos propios"] = [
+  ],
+  "Sustantivos propios": [
     { texto: "¿Cuál es un sustantivo propio?", opciones: ["Perro", "María", "silla"], correcta: 1 },
     { texto: "¿Cuál es un sustantivo propio?", opciones: ["Juan", "pelota", "nube"], correcta: 0 },
     { texto: "¿Cuál es un sustantivo propio?", opciones: ["Escuela San Martín", "escuela", "clase"], correcta: 0 },
     { texto: "¿Cuál es un sustantivo propio?", opciones: ["Argentina", "país", "continente"], correcta: 0 },
     { texto: "¿Cuál es un sustantivo propio?", opciones: ["Luna", "astro", "estrella"], correcta: 0 },
-    // Continúan hasta 50...
-  ];
-
-  bancos["Sustantivos comunes"] = [
+  ],
+  "Sustantivos comunes": [
     { texto: "¿Cuál es un sustantivo común?", opciones: ["niña", "Lucía", "Mar del Plata"], correcta: 0 },
     { texto: "¿Cuál es un sustantivo común?", opciones: ["flor", "Flor", "Flora"], correcta: 0 },
     { texto: "¿Cuál es un sustantivo común?", opciones: ["perro", "Toby", "Chiquito"], correcta: 0 },
     { texto: "¿Cuál es un sustantivo común?", opciones: ["libro", "Don Quijote", "Harry Potter"], correcta: 0 },
     { texto: "¿Cuál es un sustantivo común?", opciones: ["ciudad", "Buenos Aires", "La Plata"], correcta: 0 },
-    // Continúan hasta 50...
-  ];
-
-  bancos["Singular y plural"] = [
+  ],
+  "Singular y plural": [
     { texto: "¿Cuál es plural?", opciones: ["perros", "perro", "perra"], correcta: 0 },
     { texto: "¿Cuál es singular?", opciones: ["gato", "gatos", "gatitos"], correcta: 0 },
     { texto: "¿Cuál es plural?", opciones: ["manzanas", "manzana", "banana"], correcta: 0 },
     { texto: "¿Cuál es singular?", opciones: ["nube", "nubes", "nubarrones"], correcta: 0 },
     { texto: "¿Cuál es plural?", opciones: ["niñas", "niña", "niñita"], correcta: 0 },
-    // Continúan hasta 50...
-  ];
+  ]
+};
 
 function mostrar(seccion) {
   document.querySelectorAll("div").forEach(d => d.style.display = "none");
@@ -199,6 +178,10 @@ function elegirNombre(nom) {
   nivel = 1;
   actualizarBarra();
   document.getElementById("saludo").innerText = `¡Hola ${nombre}! Elegí una categoría:`;
+  mostrarMenu();
+}
+
+function mostrarMenu() {
   generarBotonesCategoria();
   mostrar("menuPrincipal");
 }
