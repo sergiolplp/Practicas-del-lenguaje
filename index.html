@@ -76,7 +76,7 @@
 <!-- MENÚ PRINCIPAL -->
 <div id="menuPrincipal" style="display:none">
   <h2 id="saludo"></h2>
-  <div id="botonesCategorias" class="botonesCategorias"></div>
+  <div id="botonesCategorias" class="btn-grid"></div> <!-- ← cambio aquí -->
   <br>
   <button onclick="mostrar('elegirNombre')">Volver</button>
 </div>
@@ -92,6 +92,9 @@
   <p id="mensajeRespuesta" class="mensaje"></p>
   <button onclick="mostrar('menuPrincipal')">Volver</button>
 </div>
+
+
+// ... (toda la lógica JS)
 
 <script>
 let nombre = "", puntaje = 0, nivel = 1;
