@@ -78,7 +78,7 @@
   <h2 id="saludo"></h2>
   <div id="botonesCategorias" class="btn-grid"></div>
   <br>
-  <button onclick="mostrarMenu()">Volver</button>
+  <button onclick="mostrar('elegirNombre')">Volver</button>
 </div>
 
 <!-- CONTENIDO DE CATEGORÍA -->
@@ -178,10 +178,6 @@ function elegirNombre(nom) {
   nivel = 1;
   actualizarBarra();
   document.getElementById("saludo").innerText = `¡Hola ${nombre}! Elegí una categoría:`;
-  mostrarMenu();
-}
-
-function mostrarMenu() {
   generarBotonesCategoria();
   mostrar("menuPrincipal");
 }
