@@ -231,6 +231,15 @@ function verificarRespuesta(indice) {
     document.getElementById("mensajeRespuesta").innerText = "¡Ups! Esa no es.";
     document.getElementById("mensajeRespuesta").className = "mensaje error";
   }
+  setTimeout(siguientePregunta, 1000); // Espera 1 segundo antes de la siguiente pregunta
+}
+
+function actualizarBarra() {
+  const porcentaje = Math.min(100, (puntaje % 10) * 10);
+  document.getElementById("barraNivel").style.width = porcentaje + "%";
+  document.getElementById("puntaje").innerText = `Nivel: ${nivel} | Respuestas correctas: ${puntaje}`;
+}
+
   setTimeout(siguientePregunta, function actualizarBarra() {
   const porcentaje = Math.min(100, (puntaje % 10) * 10);
   document.getElementById("barraNivel").style.width = porcentaje + "%";
