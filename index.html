@@ -3,6 +3,376 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" href="./icon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" href="./icon.ico">
+  <style>
+    body {
+      font-family: 'Fredoka', sans-serif;
+      text-align: center;
+      background-color: #ffe4f0;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      box-sizing: border-box;
+      padding-bottom: 70px;
+    }
+    button {
+      font-size: 1.5rem;
+      padding: 15px 30px;
+      margin: 10px;
+      border: none;
+      border-radius: 10px;
+      background-color: #fdd835;
+      color: #333;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background-color: #fbc02d;
+    }
+    .character {
+      height: 150px;
+      margin: 30px 10px 30px 10px;
+      width: 150px;
+      border-radius: 15px;
+    }
+    .hidden {
+      display: none;
+    }
+    #answers button {
+      display: block;
+      width: 80%;
+      margin: 10px auto;
+    }
+    #feedback {
+      font-size: 1.3rem;
+      margin: 15px;
+      height: 2em;
+    }
+    .volver-btn {
+      background-color: orange;
+      color: white;
+      margin-top: auto;
+      margin-bottom: 100px;
+      overflow-y: auto;
+    }
+    .footer {
+      background-color: #ffc1e3;
+      color: #333;
+      text-align: center;
+      padding: 10px 10px;
+      font-size: 1rem;
+      font-style: italic;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      z-index: 999;
+    }
+    .character-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    /* Barra de nivel */
+    #nivel-container {
+      width: 80%;
+      margin: 10px auto;
+      text-align: center;
+    }
+    .barra-nivel {
+      background-color: #ddd;
+      border-radius: 20px;
+      height: 20px;
+      overflow: hidden;
+      margin-top: 5px;
+    }
+    #nivel-barra {
+      height: 100%;
+      width: 0%;
+      background-color: #8bc34a;
+      transition: width 0.4s ease-in-out;
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container" id="welcome-screen">
+    <h1>🐾 ¡Luci, Sofi... a jugar con las matemáticas! 🦄</h1>
+    <div class="character-row">
+      <img src="./carpincho.PNG" alt="Carpincho" class="character">
+      <img src="./unicornio.PNG" alt="Unicornio" class="character">
+    </div>
+    <button onclick="showMenu()">¡Empezar a jugar!</button>
+    <button onclick="showHelp()">¿Cómo se resuelve?</button>
+  </div>
+
+  <div class="container hidden" id="select-user-screen">
+  <h2>¿Quién va a jugar?</h2>
+  <button onclick="selectUser('Lucía')">Lucía</button>
+  <button onclick="selectUser('Sofía')">Sofía</button>
+  <br>
+  
+  <button onclick="reiniciarProgreso()">🔄 Reiniciar progreso</button>
+  
+  <br>
+  <button class="volver-btn" onclick="goToWelcome()">Volver</button>
+</div>
+
+  <div class="container hidden" id="menu-screen">
+    <h2 id="saludo-usuario">Elegí una operación</h2>
+    <button onclick="startGame('+')">➕ Suma</button>
+    <button onclick="startGame('-')">➖ Resta</button>
+    <button onclick="startGame('*')">✖️ Multiplicación</button>
+    <button onclick="startGame('/')">➗ División</button>
+    <br>
+    <button class="volver-btn" onclick="goToWelcome()">Volver</button>
+  </div>
+
+  <div class="container hidden" id="game-screen">
+    <h2 id="question">¿Cuánto es ...?</h2>
+
+    <!-- Barra de nivel -->
+    <div id="nivel-container">
+      <p>Nivel: <span id="nivel-numero">1</span></p>
+      <div class="barra-nivel">
+        <div id="nivel-barra"></div>
+      </div>
+    </div>
+
+    <div id="answers"></div>
+    <p id="feedback" class="animate__animated"></p>
+    <button class="volver-btn" onclick="goBack()">Volver</button>
+  </div>
+
+  <div class="container hidden" id="help-screen">
+    <h2>¿Cómo se resuelve?</h2>
+    <button onclick="showHelpText('sumar')">➕ Suma</button>
+    <button onclick="showHelpText('restar')">➖ Resta</button>
+    <button onclick="showHelpText('multiplicar')">✖️ Multiplicación</button>
+    <button onclick="showHelpText('dividir')">➗ División</button>
+    <div id="help-text" style="margin-top: 20px; font-size: 1.2rem;"></div>
+    <br>
+    <button class="volver-btn" onclick="goToWelcome()">Volver</button>
+  </div>
+
+  <footer class="footer">
+    Desarrollado con Inteligencia Artificial y la colaboración de Mamá y Papá. 🥰
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/js-confetti@latest/dist/js-confetti.browser.js"></script>
+<script>
+  let currentOperator = '+';
+  let correctAnswer = 0;
+  let nombreUsuario = '';
+  let nivel = 1;
+  let aciertos = 0;
+  const aciertosParaSubirNivel = 10;
+  const jsConfetti = new JSConfetti();
+
+  // Agrega esta línea a tu objeto de sonidos
+const sounds = {
+  correct: new Howl({ src: ['./correct.wav'] }),
+  wrong: new Howl({ src: ['./wrong.wav'] }),
+  click: new Howl({ src: ['./click.wav'] }),
+  levelUp: new Howl({ src: ['./level-up.m4a'] }) // Asegúrate de que el nombre coincida con tu archivo
+};
+
+  function showMenu() {
+    hideAll();
+    showUserSelect();
+  }
+
+  function showUserSelect() {
+    hideAll();
+    document.getElementById('select-user-screen').classList.remove('hidden');
+    sounds.click.play();
+  }
+
+  function selectUser(nombre) {
+    nombreUsuario = nombre;
+
+    // Cargar progreso si existe
+    const datos = JSON.parse(localStorage.getItem(`progreso_${nombre}`));
+    if (datos) {
+      nivel = datos.nivel;
+      aciertos = datos.aciertos;
+    } else {
+      nivel = 1;
+      aciertos = 0;
+    }
+
+    actualizarNivel();
+    hideAll();
+    document.getElementById('menu-screen').classList.remove('hidden');
+    document.getElementById('saludo-usuario').textContent = `Hola hija, ¿vamos a jugar?`;
+    sounds.click.play();
+  }
+
+  function startGame(operator) {
+    currentOperator = operator;
+    hideAll();
+    document.getElementById('game-screen').classList.remove('hidden');
+    sounds.click.play();
+    generateQuestion();
+  }
+
+  function goBack() {
+    hideAll();
+    document.getElementById('menu-screen').classList.remove('hidden');
+    sounds.click.play();
+  }
+
+  function goToWelcome() {
+    hideAll();
+    document.getElementById('welcome-screen').classList.remove('hidden');
+    sounds.click.play();
+  }
+
+  function hideAll() {
+    ['welcome-screen', 'menu-screen', 'game-screen', 'help-screen', 'select-user-screen'].forEach(id => {
+      document.getElementById(id).classList.add('hidden');
+    });
+  }
+
+  function generateQuestion() {
+    let a = Math.floor(Math.random() * 10) + 1;
+    let b = Math.floor(Math.random() * 10) + 1;
+
+    if (currentOperator === '-') {
+      if (b > a) [a, b] = [b, a];
+      correctAnswer = a - b;
+    } else if (currentOperator === '*') {
+      correctAnswer = a * b;
+    } else if (currentOperator === '/') {
+      correctAnswer = a;
+      b = Math.floor(Math.random() * 9) + 1;
+      a = correctAnswer * b;
+    } else {
+      correctAnswer = a + b;
+    }
+
+    document.getElementById('question').textContent = `¿Cuánto es ${a} ${currentOperator} ${b}?`;
+
+    const answersDiv = document.getElementById('answers');
+    answersDiv.innerHTML = '';
+    let options = [correctAnswer];
+    while (options.length < 3) {
+      let option = correctAnswer + Math.floor(Math.random() * 10) - 5;
+      if (!options.includes(option) && option >= 0) {
+        options.push(option);
+      }
+    }
+    options.sort(() => Math.random() - 0.5);
+
+    options.forEach(opt => {
+      let btn = document.createElement('button');
+      btn.textContent = opt;
+      btn.onclick = () => checkAnswer(opt);
+      answersDiv.appendChild(btn);
+    });
+
+    document.querySelectorAll('#answers button').forEach(btn => btn.disabled = false);
+  }
+
+  function checkAnswer(selected) {
+  const feedback = document.getElementById('feedback');
+  if (selected === correctAnswer) {
+    feedback.textContent = "¡Excelente hija, seguí así ❤️!";
+    feedback.className = "animate__animated animate__bounceIn";
+    sounds.correct.play();
+    aciertos++;
+    if (aciertos >= aciertosParaSubirNivel) {
+      nivel++;
+      aciertos = 0;
+      sounds.levelUp.play(); // Reproduce el sonido de nivel
+      jsConfetti.addConfetti(); // Muestra el confeti
+    }
+    actualizarNivel();
+  } else {
+    feedback.textContent = "Ups, intentá de nuevo 🤯";
+    feedback.className = "animate__animated animate__shakeX";
+    sounds.wrong.play();
+  }
+  document.querySelectorAll('#answers button').forEach(btn => btn.disabled = true);
+  setTimeout(() => {
+    feedback.textContent = "";
+    generateQuestion();
+  }, 3000);
+}
+
+  function actualizarNivel() {
+    document.getElementById('nivel-numero').textContent = nivel;
+    const progreso = (aciertos / aciertosParaSubirNivel) * 100;
+    document.getElementById('nivel-barra').style.width = progreso + "%";
+  }
+
+  function guardarProgreso() {
+    if (!nombreUsuario) return;
+    localStorage.setItem(`progreso_${nombreUsuario}`, JSON.stringify({
+      nivel: nivel,
+      aciertos: aciertos
+    }));
+  }
+
+  function reiniciarProgreso() {
+    const nombre = prompt("¿Querés reiniciar el progreso de quién? (Lucía o Sofía)");
+    if (nombre === 'Lucía' || nombre === 'Sofía') {
+      localStorage.removeItem(`progreso_${nombre}`);
+      alert(`El progreso de ${nombre} fue reiniciado.`);
+    } else {
+      alert("Nombre no válido. Escribí exactamente 'Lucía' o 'Sofía'.");
+    }
+    sounds.click.play();
+  }
+
+  function showHelp() {
+    hideAll();
+    document.getElementById('help-screen').classList.remove('hidden');
+    document.getElementById('help-text').textContent = '';
+    sounds.click.play();
+  }
+
+  function showHelpText(tipo) {
+    let texto = '';
+    if (tipo === 'sumar') {
+      texto = "Sumar es juntar. Si tenés 2 brócolis y te dan 3 más, ahora tenés 5. <br>🥦🥦➕🥦🥦🥦=🥦🥦🥦🥦🥦";
+    } else if (tipo === 'restar') {
+      texto = "Restar es sacar. Si tenés 3 caramelos y te comés 2, te quedan 1. <br> 🍬🍬🍬 ➖ 🍬🍬 = 🍬";
+    } else if (tipo === 'multiplicar') {
+      texto = "Multiplicar es repetir. Si tenés 3 grupos con 2 cosas cada uno, en total tenés 6. <br> ¡3 x 2 = 6! <br> (🍎🍎) (🍎🍎) (🍎🍎)";
+    } else if (tipo === 'dividir') {
+      texto = "Dividir es repartir. Si tenés 6 galletitas y querés compartir con 3 amigas, a cada una le das 2. <br>🍪🍪🍪🍪🍪🍪➗🍪🍪🍪🍪🍪🍪=🍪🍪";
+    }
+    document.getElementById('help-text').innerHTML = texto;
+    sounds.click.play();
+  }
+</script>
+  
+</body>
+</html>
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Prácticas del lenguaje</title>
   <style>
     body {
